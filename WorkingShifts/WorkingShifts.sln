@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkingShifts.Infrastructure", "WorkingShifts.Infrastructure\WorkingShifts.Infrastructure.csproj", "{08BF2D56-5646-4FF7-ADC8-02FFB992BB20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkingShifts.Service", "WorkingShifts.Service\WorkingShifts.Service.csproj", "{AF156484-B226-4EAF-9F71-D7249AE23A78}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkingShifts.Web", "WorkingShifts.Web\WorkingShifts.Web.csproj", "{69A92884-F263-43B7-953A-2E5C24FA0246}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08BF2D56-5646-4FF7-ADC8-02FFB992BB20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08BF2D56-5646-4FF7-ADC8-02FFB992BB20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08BF2D56-5646-4FF7-ADC8-02FFB992BB20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08BF2D56-5646-4FF7-ADC8-02FFB992BB20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF156484-B226-4EAF-9F71-D7249AE23A78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF156484-B226-4EAF-9F71-D7249AE23A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF156484-B226-4EAF-9F71-D7249AE23A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF156484-B226-4EAF-9F71-D7249AE23A78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69A92884-F263-43B7-953A-2E5C24FA0246}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69A92884-F263-43B7-953A-2E5C24FA0246}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69A92884-F263-43B7-953A-2E5C24FA0246}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69A92884-F263-43B7-953A-2E5C24FA0246}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
