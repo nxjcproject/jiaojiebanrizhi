@@ -18,6 +18,38 @@ namespace WorkingShifts.Web.UI_WorkingShifts
 
         }
 
+        #region Create
+
+        /// <summary>
+        /// 创建交接班日志
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public static string CreateWorkingTeamShiftLog(string organizationId, string json)
+        {
+            string time = json.JsonPick("time");
+            string shifts = json.JsonPick("shifts");
+            string workingTeam = json.JsonPick("workingTeam");
+            string chargeMan = json.JsonPick("chargeMan");
+            string operators = json.JsonPick("operators");
+            string haltLogs = json.JsonPick("haltLogs");
+            string dcsWarningLogs = json.JsonPick("dcsWarningLogs");
+            string performToObjectives = json.JsonPick("performToObjectives");
+            string problemsAndSettlements = json.JsonPick("problemsAndSettlements");
+            string equipmentSituation = json.JsonPick("equipmentSituation");
+            string advicesToNextShift = json.JsonPick("advicesToNextShift");
+
+            string[] operatorJsons = operators.JsonPickArray("rows");
+
+            return "";
+        }
+
+        #endregion
+
+        #region Read
+
         [WebMethod]
         public static string GetWorkingTeamWithComboboxFormat(string organizationId)
         {
@@ -54,5 +86,8 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             DataTable dt = DCSSystemServcie.GetDCSSystemByOrganizationId(organizationId);
             return DataGridJsonParser.DataTableToJson(dt, "Name", "OrganizationID");
         }
+
+        #endregion
+
     }
 }

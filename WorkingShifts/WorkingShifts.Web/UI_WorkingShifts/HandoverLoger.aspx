@@ -54,9 +54,10 @@
 		            <thead>
 			            <tr>
                             <th data-options="field:'Name',width:100">DCS系统</th>
-                            <th data-options="field:'WorkingSectionID',width:180,
+                            <th data-options="field:'StaffName_SHSPS',hidden:true"></th>
+                            <th data-options="field:'StaffID_SHSPS',width:180,
 						            formatter:function(value,row){
-							            return row.StaffID;
+							            return row.StaffName_SHSPS;
 						            },
 						            editor:{
 							            type:'combobox',
@@ -66,9 +67,10 @@
                                             data: getStaffInfo()
 							            }
 						            }">石灰石破碎</th>
-                            <th data-options="field:'WorkingSectionID',width:180,
+                            <th data-options="field:'StaffName_MFZB',hidden:true"></th>
+                            <th data-options="field:'StaffID_MFZB',width:180,
 						            formatter:function(value,row){
-							            return row.StaffID;
+							            return row.StaffName_MFZB;
 						            },
 						            editor:{
 							            type:'combobox',
@@ -78,9 +80,10 @@
                                             data: getStaffInfo()
 							            }
 						            }">煤粉制备</th>
-                            <th data-options="field:'WorkingSectionID',width:180,
+                            <th data-options="field:'StaffName_SHENGLIAOZB',hidden:true"></th>
+                            <th data-options="field:'StaffID_SHENGLIAOZB',width:180,
 						            formatter:function(value,row){
-							            return row.StaffID;
+							            return row.StaffName_SHENGLIAOZB;
 						            },
 						            editor:{
 							            type:'combobox',
@@ -90,9 +93,10 @@
                                             data: getStaffInfo()
 							            }
 						            }">生料制备</th>
-                            <th data-options="field:'WorkingSectionName',width:180,
+                            <th data-options="field:'StaffName_SHULIAOZB',hidden:true"></th>
+                            <th data-options="field:'StaffID_SHULIAOZB',width:180,
 						            formatter:function(value,row){
-							            return row.StaffID;
+							            return row.StaffName_SHULIAOZB;
 						            },
 						            editor:{
 							            type:'combobox',
@@ -102,9 +106,10 @@
                                             data: getStaffInfo()
 							            }
 						            }">熟料制备</th>
-                            <th data-options="field:'WorkingSectionID',width:180,
+                            <th data-options="field:'StaffName_SHUINIZB',hidden:true"></th>
+                            <th data-options="field:'StaffID_SHUINIZB',width:180,
 						            formatter:function(value,row){
-							            return row.StaffID;
+							            return row.StaffName_SHUINIZB;
 						            },
 						            editor:{
 							            type:'combobox',
@@ -114,9 +119,10 @@
                                             data: getStaffInfo()
 							            }
 						            }">水泥粉磨</th>
-                            <th data-options="field:'WorkingSectionID',width:180,
+                            <th data-options="field:'StaffName_FZZB',hidden:true"></th>
+                            <th data-options="field:'StaffID_FZZB',width:180,
 						            formatter:function(value,row){
-							            return row.StaffID;
+							            return row.StaffName_FZZB;
 						            },
 						            editor:{
 							            type:'combobox',
@@ -126,22 +132,6 @@
                                             data: getStaffInfo()
 							            }
 						            }">辅助生产</th>
-<%--				            <th data-options="field:'StaffID',width:300,
-						            formatter:function(value,row){
-							            return row.StaffID;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">操作员工号</th>
-                            <th data-options="field:'StaffName',width:300,
-						            formatter:function(value,row){
-							            return row.StaffName;
-						            }">操作员姓名</th>--%>
 			            </tr>
 		            </thead>
 	            </table>
@@ -417,11 +407,19 @@
 	    function osEndEditing() {
 	        if (osEditIndex == undefined) { return true }
 	        if ($('#operatorSelector').datagrid('validateRow', osEditIndex)) {
-	            var ed = $('#operatorSelector').datagrid('getEditor', { index: osEditIndex, field: 'StaffID' });
-	            var staffId = $(ed.target).combobox('getValue');
-	            var staffName = $(ed.target).combobox('getText').split('  ')[1];
-	            $('#operatorSelector').datagrid('getRows')[osEditIndex]['StaffID'] = staffId;
-	            $('#operatorSelector').datagrid('getRows')[osEditIndex]['StaffName'] = staffName;
+	            // 获取操作员选择编辑器中的工段列
+	            var cols = $('#operatorSelector').datagrid('getColumnFields');
+                // 除去第1列是DCS名称，遍历工段列，每个工段有两列
+	            for (var i = 1; i < cols.length; i += 2) {
+	                // cols[i]: StaffName_xxx
+                    // cols[i+1]: StaffID_xxx
+	                var ed = $('#operatorSelector').datagrid('getEditor', { index: osEditIndex, field: cols[i + 1] });
+	                var staffId = $(ed.target).combobox('getValue');
+	                var staffName = $(ed.target).combobox('getText');
+	                $('#operatorSelector').datagrid('getRows')[osEditIndex][cols[i + 1]] = staffId;
+	                $('#operatorSelector').datagrid('getRows')[osEditIndex][cols[i]] = staffName;
+	            }
+                // 结束编辑
 	            $('#operatorSelector').datagrid('endEdit', osEditIndex);
 	            osEditIndex = undefined;
 	            return true;
@@ -452,9 +450,8 @@
 
 	    // 停机原因选择
 	    function getHaltLog() {
-	        var productLineId = 1;
 	        var queryUrl = 'WorkingService.asmx/GetMachineHaltLogWithDataGridFormat';
-	        var dataToSend = '{productLineId: ' + productLineId + '}';
+	        var dataToSend = '{organizationId: "' + organizationId + '"}';
 
 	        $.ajax({
 	            type: "POST",
@@ -579,7 +576,7 @@
 	        $('#ccWarningLoger').datagrid('acceptChanges');
 
 	        var time = "\"time\":\"" + $('#time').datetimespinner('getValue') + "\"";
-	        var shifts = "\"shifts\":\"" + $('#shifts').combobox('getValue') + "\"";
+	        var shifts = "\"shifts\":\"" + $('#shifts').combobox('getText') + "\"";
 	        var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
 	        var chargeMan = "\"chargeMan\":\"" + $('#chargeMan').combobox('getValue') + "\"";
 
@@ -595,9 +592,8 @@
 	        var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' +
                 performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
 
-	        var productLineId = 1;
-	        var queryUrl = 'WorkingService.asmx/CreateWorkingTeamShiftLog';
-	        var dataToSend = '{productLineId:' + productLineId + ',json:\'' + loger + '\'}';
+	        var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
+	        var dataToSend = '{organizationId:"' + organizationId + '",json:\'' + loger + '\'}';
 
 	        $.ajax({
 	            type: "POST",
