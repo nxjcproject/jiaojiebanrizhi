@@ -53,7 +53,8 @@
 			            ">
 		            <thead>
 			            <tr>
-                            <th data-options="field:'Name',width:100">DCS系统</th>
+                            <th data-options="field:'OrganizationID',hidden:true">DCSID</th>
+                            <th data-options="field:'Name',width:100"></th>
                             <th data-options="field:'StaffName_SHSPS',hidden:true"></th>
                             <th data-options="field:'StaffID_SHSPS',width:180,
 						            formatter:function(value,row){
@@ -153,22 +154,23 @@
 			            ">
 		            <thead>
 			            <tr>
+                            <th data-options="field:'MachineHaltLogID',hidden:true"></th>
 				            <th data-options="field:'HaltTime',width:120">停机时间</th>
                             <th data-options="field:'ReasonID',hidden:true"></th>
                             <th data-options="field:'ReasonText',hidden:true"></th>
                             <th data-options="field:'Label',width:120">设备点号</th>
-                            <th data-options="field:'Machine',width:120">设备名称</th>
+                            <th data-options="field:'EquipmentName',width:120">设备名称</th>
 				            <th data-options="field:'Reason',width:300,
                                     formatter:function(value,row){
 							            return row.ReasonText;
 						            },
 						            editor:{
-							            type:'combobox',
+							            type:'combotree',
 							            options:{
-								            valueField:'ID',
-								            textField:'Name',
-								            method:'post',
-								            url:'WorkingService.asmx/GetMachineHaltReasonWithComboboxFormat'
+								            valueField:'MachineHaltReasonID',
+								            textField:'ReasonText',
+								            data:getMachineHaltReasons(),
+                                            onClick: changeHaltReason
 							            }
 						            }">停机原因</th>
                             <th data-options="field:'Remarks',width:300,editor:{type:'textbox'}">备注</th>
@@ -191,7 +193,9 @@
 			            ">
 		            <thead>
 			            <tr>
-				            <th data-options="field:'WarningTime',width:120">报警时间</th>
+                            <th data-options="field:'DCSWarningLogID',hidden:true">DCSWarningLogID</th>
+				            <th data-options="field:'StartingTime',width:120">报警开始时间</th>
+                            <th data-options="field:'EndingTime',width:120">报警结束时间</th>
                             <th data-options="field:'Label',width:120">报警点号</th>
 				            <th data-options="field:'Message',width:120">报警原因</th>
                             <th data-options="field:'HandleInformation',width:300,editor:{type:'textbox'}">处理情况</th>
@@ -205,51 +209,30 @@
 	            </div>
             </div>
             <div style="margin-top: 20px;">
-                <!--电耗报警记录DataGrid-->
-	            <table id="pcWarningLoger" class="easyui-datagrid" title="电耗报警记录" style="width:100%;height:auto"
+                <!--能耗报警记录DataGrid-->
+	            <table id="ecAlarmLoger" class="easyui-datagrid" title="能耗报警记录" style="width:100%;height:auto"
 			            data-options="
 				            iconCls: 'icon-edit',
 				            singleSelect: true,
-				            onClickRow: dcswlOnClickRow,
-                            toolbar: '#tbpcWarningLoger'
+				            onClickRow: ecalOnClickRow,
+                            toolbar: '#tbecAlarmLoger'
 			            ">
 		            <thead>
 			            <tr>
-				            <th data-options="field:'WarningTime',width:120">报警时间</th>
-                            <th data-options="field:'Label',width:120">报警点号</th>
-				            <th data-options="field:'Message',width:120">报警原因</th>
-                            <th data-options="field:'HandleInformation',width:300,editor:{type:'textbox'}">处理情况</th>
-                            <th data-options="field:'Remarks',width:300,editor:{type:'textbox'}">备注</th>
+                            <th data-options="field:'EnergyConsumptionAlarmLogID',hidden:true">EnergyConsumptionAlarmLogID</th>
+				            <th data-options="field:'StartTime',width:120">报警时间</th>
+                            <th data-options="field:'TimeSpan',width:220">参数超标时间段</th>
+				            <th data-options="field:'Name',width:150">工序名称</th>
+                            <th data-options="field:'StandardValue',width:120">标准值</th>
+                            <th data-options="field:'ActualValue',width:120">实际值</th>
+                            <th data-options="field:'Superscale',width:120">超标（%）</th>
+                            <th data-options="field:'Reason',width:300,editor:{type:'textbox'}">原因分析</th>
 			            </tr>
 		            </thead>
 	            </table>
-	            <div id="tbpcWarningLoger" style="height:auto">
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="dcswlAccept()">应用</a>
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="dcswlReject()">取消</a>
-	            </div>
-            </div>
-            <div style="margin-top: 20px;">
-                <!--煤耗报警记录DataGrid-->
-	            <table id="ccWarningLoger" class="easyui-datagrid" title="煤耗报警记录" style="width:100%;height:auto"
-			            data-options="
-				            iconCls: 'icon-edit',
-				            singleSelect: true,
-				            onClickRow: dcswlOnClickRow,
-                            toolbar: '#tbccWarningLoger'
-			            ">
-		            <thead>
-			            <tr>
-				            <th data-options="field:'WarningTime',width:120">报警时间</th>
-                            <th data-options="field:'Label',width:120">报警点号</th>
-				            <th data-options="field:'Message',width:120">报警原因</th>
-                            <th data-options="field:'HandleInformation',width:300,editor:{type:'textbox'}">处理情况</th>
-                            <th data-options="field:'Remarks',width:300,editor:{type:'textbox'}">备注</th>
-			            </tr>
-		            </thead>
-	            </table>
-	            <div id="tbccWarningLoger" style="height:auto">
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="dcswlAccept()">应用</a>
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="dcswlReject()">取消</a>
+	            <div id="tbecAlarmLoger" style="height:auto">
+		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="ecalAccept()">应用</a>
+		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="ecalReject()">取消</a>
 	            </div>
             </div>
         </div>
@@ -281,6 +264,7 @@
 
 	    var organizationId = 'C41B1F47-A48A-495F-A890-0AABB2F3BFF7';
 	    var staffInfo;
+	    var machineHaltReasons;
 
 	    $(document).ready(function () {
 	        // 初始化班组下拉列表
@@ -289,12 +273,14 @@
 	        initializeStaffInfo();
 	        // 初始负责人下拉列表
 	        initializeChargManCombobox();
-	        // 获取工段信息
-	        getWorkingSection();
+	        // 获取DCS系统信息
+	        getDCSSystem();
 	        // 获取停机记录
 	        getHaltLog();
 	        // 获取报警记录
 	        getWarningLog();
+            // 获取能耗报警记录
+	        getEnergyConsumptionAlarmLog();
 	    });
 
 	    // 初始化班组下拉列表
@@ -345,6 +331,28 @@
 	        getStaffInfo();
 	    }
 
+        // 获取停机原因
+	    function getMachineHaltReasons() {
+	        if (machineHaltReasons == null) {
+	            var queryUrl = 'HandoverLoger.aspx/GetMachineHaltReasonsWithCombotreeFormat';
+	            var dataToSend = '';
+
+	            $.ajax({
+	                type: "POST",
+	                url: queryUrl,
+	                data: dataToSend,
+	                contentType: "application/json; charset=utf-8",
+	                dataType: "json",
+	                async: false,
+	                success: function (msg) {
+	                    machineHaltReasons = jQuery.parseJSON(msg.d);
+	                }
+	            });
+	        }
+
+	        return machineHaltReasons;
+	    }
+
 	    // 初始负责人下拉列表
 	    function initializeChargManCombobox() {
 	        $('#chargeMan').combobox({ data: staffInfo });
@@ -355,7 +363,15 @@
 	        var workingTeamName = $('#workingTeam').combobox('getText');
 	        getChargeManByWorkingTeam(workingTeamName);
 	    }
+        
+        // 更新停机原因
+	    function changeHaltReason(node) {
+	        if (node.id.length != 7) {
+	            $.messager.alert('提示', '停机原因需要明确到第三层', 'info');
+	        }
+	    }
 
+        // 按班组获取负责人
 	    function getChargeManByWorkingTeam(workingTeamName) {
 	        var queryUrl = 'HandoverLoger.aspx/GetChargeManByWorkingTeamNameWithComboboxFormat';
 	        var dataToSend = '{workingTeamName: "' + workingTeamName + '"}';
@@ -379,7 +395,7 @@
 	    }
 
 	    // 生成操作员选择grid
-	    function getWorkingSection() {
+	    function getDCSSystem() {
 	        var queryUrl = 'HandoverLoger.aspx/GetDCSSystemWithDataGridFormat';
 	        var dataToSend = '{organizationId: "' + organizationId + '"}';
 
@@ -410,7 +426,7 @@
 	            // 获取操作员选择编辑器中的工段列
 	            var cols = $('#operatorSelector').datagrid('getColumnFields');
                 // 除去第1列是DCS名称，遍历工段列，每个工段有两列
-	            for (var i = 1; i < cols.length; i += 2) {
+	            for (var i = 2; i < cols.length; i += 2) {
 	                // cols[i]: StaffName_xxx
                     // cols[i+1]: StaffID_xxx
 	                var ed = $('#operatorSelector').datagrid('getEditor', { index: osEditIndex, field: cols[i + 1] });
@@ -430,6 +446,7 @@
 	    function osOnClickRow(index) {
 	        if (osEditIndex != index) {
 	            if (osEndEditing()) {
+	                AcceptAll();
 	                $('#operatorSelector').datagrid('selectRow', index)
 							.datagrid('beginEdit', index);
 	                osEditIndex = index;
@@ -450,7 +467,7 @@
 
 	    // 停机原因选择
 	    function getHaltLog() {
-	        var queryUrl = 'WorkingService.asmx/GetMachineHaltLogWithDataGridFormat';
+	        var queryUrl = 'HandoverLoger.aspx/GetMachineHaltLogWithDataGridFormat';
 	        var dataToSend = '{organizationId: "' + organizationId + '"}';
 
 	        $.ajax({
@@ -494,6 +511,7 @@
 	    function hlOnClickRow(index) {
 	        if (hlEditIndex != index) {
 	            if (hlEndEditing()) {
+	                AcceptAll();
 	                $('#haltLoger').datagrid('selectRow', index)
 							.datagrid('beginEdit', index);
 	                hlEditIndex = index;
@@ -514,9 +532,8 @@
 
 	    // 生成报警信息grid
 	    function getWarningLog() {
-	        var productLineId = 1;
-	        var queryUrl = 'WorkingService.asmx/GetDCSWarningLogWithDataGridFormat';
-	        var dataToSend = '{productLineId: ' + productLineId + '}';
+	        var queryUrl = 'HandoverLoger.aspx/GetDCSWarningLogWithDataGridFormat';
+	        var dataToSend = '{organizationId: "' + organizationId + '"}';
 
 	        $.ajax({
 	            type: "POST",
@@ -541,10 +558,13 @@
 
 	    var dcswlEditIndex = undefined;
 	    function dcswlEndEditing() {
+	        if (dcswlEditIndex == undefined) { return true }
 	        $('#dcsWarningLoger').datagrid('endEdit', dcswlEditIndex);
+	        dcswlEditIndex = undefined;
 	        return true;
 	    }
 	    function dcswlOnClickRow(index) {
+	        AcceptAll();
 	        if (dcswlEditIndex != index) {
 	            if (dcswlEndEditing()) {
 	                $('#dcsWarningLoger').datagrid('selectRow', index)
@@ -565,35 +585,11 @@
 	        dcswlEditIndex = undefined;
 	    }
 
-	    // 提交
 
-	    function submit() {
-	        // 应用变化
-	        osAccept();
-	        hlAccept();
-	        dcswlAccept();
-	        $('#pcWarningLoger').datagrid('acceptChanges');
-	        $('#ccWarningLoger').datagrid('acceptChanges');
-
-	        var time = "\"time\":\"" + $('#time').datetimespinner('getValue') + "\"";
-	        var shifts = "\"shifts\":\"" + $('#shifts').combobox('getText') + "\"";
-	        var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
-	        var chargeMan = "\"chargeMan\":\"" + $('#chargeMan').combobox('getValue') + "\"";
-
-	        var operators = "\"operators\":" + (JSON.stringify($('#operatorSelector').datagrid('getData')));
-	        var haltLogs = "\"haltLogs\":" + (JSON.stringify($('#haltLoger').datagrid('getData')));
-	        var dcsWarningLogs = "\"dcsWarningLogs\":" + (JSON.stringify($('#dcsWarningLoger').datagrid('getData')));
-
-	        var performToObjectives = "\"performToObjectives\":\"" + $('#performToObjectives').val() + "\"";
-	        var problemsAndSettlements = "\"problemsAndSettlements\":\"" + $('#problemsAndSettlements').val() + "\"";
-	        var equipmentSituation = "\"equipmentSituation\":\"" + $('#equipmentSituation').val() + "\"";
-	        var advicesToNextShift = "\"advicesToNextShift\":\"" + $('#advicesToNextShift').val() + "\"";
-
-	        var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' +
-                performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
-
-	        var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
-	        var dataToSend = '{organizationId:"' + organizationId + '",json:\'' + loger + '\'}';
+	    // 生成能耗报警信息
+	    function getEnergyConsumptionAlarmLog() {
+	        var queryUrl = 'HandoverLoger.aspx/GetEnergyConsumptionAlarmLogWithDataGridFormat';
+	        var dataToSend = '{organizationId: "' + organizationId + '"}';
 
 	        $.ajax({
 	            type: "POST",
@@ -602,10 +598,131 @@
 	            contentType: "application/json; charset=utf-8",
 	            dataType: "json",
 	            success: function (msg) {
-	                alert('s');
+	                initializeEnergyConsumptionAlarmLoger(jQuery.parseJSON(msg.d));
 	            }
 	        });
+	    }
 
+	    function initializeEnergyConsumptionAlarmLoger(json) {
+	        $('#ecAlarmLoger').datagrid({
+	            data: json
+	        });
+	    }
+
+	    // 能耗报警编辑
+	    // ecal: energy consumption alarm log
+
+	    var ecalEditIndex = undefined;
+	    function ecalEndEditing() {
+	        if (ecalEditIndex == undefined) { return true }
+	        $('#ecAlarmLoger').datagrid('endEdit', ecalEditIndex);
+	        ecalEditIndex = undefined;
+	        return true;
+	    }
+	    function ecalOnClickRow(index) {
+	        AcceptAll();
+	        if (ecalEditIndex != index) {
+	            if (ecalEndEditing()) {
+	                $('#ecAlarmLoger').datagrid('selectRow', index)
+							.datagrid('beginEdit', index);
+	                ecalEditIndex = index;
+	            } else {
+	                $('#ecAlarmLoger').datagrid('selectRow', ecalEditIndex);
+	            }
+	        }
+	    }
+	    function ecalAccept() {
+	        if (ecalEndEditing()) {
+	            $('#ecAlarmLoger').datagrid('acceptChanges');
+	        }
+	    }
+	    function ecalReject() {
+	        $('#ecAlarmLoger').datagrid('rejectChanges');
+	        ecalEditIndex = undefined;
+	    }
+
+	    // 应用变化
+	    function AcceptAll() {
+	        osAccept();
+	        hlAccept();
+	        dcswlAccept();
+	        ecalAccept();
+
+	        $('#operatorSelector').datagrid('unselectAll');
+	        $('#haltLoger').datagrid('unselectAll');
+	        $('#dcsWarningLoger').datagrid('unselectAll');
+	        $('#ecAlarmLoger').datagrid('unselectAll');
+	    }
+
+	    function Validate() {
+	        // 检验班组
+	        if ($('#workingTeam').combobox('getText') == "") {
+	            $.messager.alert('错误', '请选择当前班组', 'error');
+	            return false;
+	        }
+
+	        // 检验负责人
+	        if ($('#chargeMan').combobox('getText') == "") {
+	            $.messager.alert('错误', '请选择负责人', 'error');
+	            return false;
+	        }
+
+	        // 检验停机原因
+	        var haltLogs = $('#haltLoger').datagrid('getData');
+	        for (var i = 0; i < haltLogs.total; i++) {
+	            if (haltLogs.rows[i].ReasonID.length != 7) {
+	                $.messager.alert('错误', '请为停机时间： ' + haltLogs.rows[i].HaltTime + ' 的记录选择明确的停机原因', 'error');
+	                return false;
+	            }
+	        }
+	    }
+
+	    // 提交
+	    function submit() {
+
+	        AcceptAll();
+	        if (Validate() == false)
+	            return;
+
+	        $.messager.confirm('确认', '确认提交交接班日志？', function (r) {
+	            if (r) {
+	                var time = "\"time\":\"" + $('#time').datetimespinner('getValue') + "\"";
+	                var shifts = "\"shifts\":\"" + $('#shifts').combobox('getText') + "\"";
+	                var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
+	                var chargeMan = "\"chargeMan\":\"" + $('#chargeMan').combobox('getValue') + "\"";
+
+	                var operators = "\"operators\":" + (JSON.stringify($('#operatorSelector').datagrid('getData')));
+	                var haltLogs = "\"haltLogs\":" + (JSON.stringify($('#haltLoger').datagrid('getData')));
+	                var dcsWarningLogs = "\"dcsWarningLogs\":" + (JSON.stringify($('#dcsWarningLoger').datagrid('getData')));
+	                var ecAlarmLogs = "\"energyConsumptionAlarmLogs\":" + (JSON.stringify($('#ecAlarmLoger').datagrid('getData')));
+
+	                var performToObjectives = "\"performToObjectives\":\"" + $('#performToObjectives').val() + "\"";
+	                var problemsAndSettlements = "\"problemsAndSettlements\":\"" + $('#problemsAndSettlements').val() + "\"";
+	                var equipmentSituation = "\"equipmentSituation\":\"" + $('#equipmentSituation').val() + "\"";
+	                var advicesToNextShift = "\"advicesToNextShift\":\"" + $('#advicesToNextShift').val() + "\"";
+
+	                var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' +
+                        performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
+
+	                var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
+	                var dataToSend = '{organizationId:"' + organizationId + '",json:\'' + loger + '\'}';
+
+	                $.ajax({
+	                    type: "POST",
+	                    url: queryUrl,
+	                    data: dataToSend,
+	                    contentType: "application/json; charset=utf-8",
+	                    dataType: "json",
+	                    success: function (msg) {
+	                        if (msg.d == "success") {
+	                            $.messager.alert('提示', '日志创建成功', 'info', function (r) {
+	                                window.location.href = 'HandoverLoger.aspx';
+	                            });
+	                        }
+	                    }
+	                });
+	            }
+	        });
 	    }
 	</script>
     <form id="form1" runat="server"></form>
