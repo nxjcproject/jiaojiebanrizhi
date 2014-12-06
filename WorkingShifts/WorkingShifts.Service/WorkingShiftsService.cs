@@ -1,6 +1,7 @@
 ﻿using EasyUIJsonParser;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -149,6 +150,17 @@ namespace WorkingShifts.Service
                 if (string.IsNullOrWhiteSpace(staffId) == false)
                     CreateOperatorLog(workingTeamShiftLogID, organizationId, "辅助生产", staffId);
             }
+        }
+
+        /// <summary>
+        /// 按交接班记录ID获取交接班日志
+        /// </summary>
+        /// <param name="workingTeamShiftLogId"></param>
+        /// <returns></returns>
+        public static DataTable GetWorkingTeamShiftLog(string workingTeamShiftLogId)
+        {
+
+            return new DataTable();
         }
     }
 }
