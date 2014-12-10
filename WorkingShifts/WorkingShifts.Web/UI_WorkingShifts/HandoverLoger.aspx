@@ -641,6 +641,14 @@
 	        ecalEditIndex = undefined;
 	    }
 
+	    // 取消选中
+	    function UnselectAll() {
+	        $('#operatorSelector').datagrid('unselectAll');
+	        $('#haltLoger').datagrid('unselectAll');
+	        $('#dcsWarningLoger').datagrid('unselectAll');
+	        $('#ecAlarmLoger').datagrid('unselectAll');
+	    }
+
 	    // 应用变化
 	    function AcceptAll() {
 	        osAccept();
@@ -648,10 +656,7 @@
 	        dcswlAccept();
 	        ecalAccept();
 
-	        $('#operatorSelector').datagrid('unselectAll');
-	        $('#haltLoger').datagrid('unselectAll');
-	        $('#dcsWarningLoger').datagrid('unselectAll');
-	        $('#ecAlarmLoger').datagrid('unselectAll');
+	        UnselectAll();
 	    }
 
 	    function Validate() {

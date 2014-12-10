@@ -26,7 +26,7 @@
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
             <div style="float:left;">
                 时间：
-                <input id="time" class="easyui-datetimespinner" value="1111/11/11"  data-options="selections:[[11,13],[14,16]]" readonly="true" style="width:180px;" />
+                <input id="time" class="easyui-textbox" readonly="true" style="width:180px;" />
                 班次：
                 <select id="shifts" class="easyui-combobox" data-options="editable: false" name="state" readonly="true" style="width:80px;">
 		            <option value="A">甲班</option>
@@ -136,18 +136,18 @@
                 <tr>
                     <td style="width:80px">本班生产计划完成情况</td>
                     <td>
-                        <textarea id="performToObjectives" style="width:95%;height:50px;"></textarea></td>
+                        <textarea id="performToObjectives" style="width:95%;height:50px;" readonly="readonly"></textarea></td>
                     <td style="width:80px">本班出现的问题及处理情况</td>
                     <td>
-                        <textarea id="problemsAndSettlements" style="width:95%;height:50px;"></textarea></td>
+                        <textarea id="problemsAndSettlements" style="width:95%;height:50px;" readonly="readonly"></textarea></td>
                 </tr>
                 <tr>
                     <td style="width:80px">本班设备运行情况</td>
                     <td>
-                        <textarea id="equipmentSituation" style="width:95%;height:50px;"></textarea></td>
+                        <textarea id="equipmentSituation" style="width:95%;height:50px;" readonly="readonly"></textarea></td>
                     <td style="width:80px">下班工作重点及建议</td>
                     <td>
-                        <textarea id="advicesToNextShift" style="width:95%;height:50px;"></textarea></td>
+                        <textarea id="advicesToNextShift" style="width:95%;height:50px;" readonly="readonly"></textarea></td>
                 </tr>
             </table>
         </div>
@@ -158,8 +158,10 @@
 	    var workingTeamShiftLogId = '7740FE1A-3E6C-4C25-89FF-D08C6EE3E995';
 
 	    $(document).ready(function () {
-	        // 获取DCS系统信息
-	        getDCSSystem();
+	        // 获取交接班日志
+	        getWorkingShiftLog();
+	        // 获取操作员记录
+	        getOperatorsLog();
 	        // 获取停机记录
 	        getHaltLog();
 	        // 获取报警记录
@@ -168,11 +170,10 @@
 	        getEnergyConsumptionAlarmLog();
 	    });
 
-
-	    // 按班组获取负责人
-	    function getChargeManByWorkingTeam(workingTeamName) {
-	        var queryUrl = 'HandoverLoger.aspx/GetChargeManByWorkingTeamNameWithComboboxFormat';
-	        var dataToSend = '{workingTeamName: "' + workingTeamName + '"}';
+        // 获取交接班日志信息
+	    function getWorkingShiftLog() {
+	        var queryUrl = 'HandoverLogDetail.aspx/GetWorkingTeamShiftLog';
+	        var dataToSend = '{workingTeamShiftLogId: "' + workingTeamShiftLogId + '"}';
 
 	        $.ajax({
 	            type: "POST",
@@ -181,21 +182,28 @@
 	            contentType: "application/json; charset=utf-8",
 	            dataType: "json",
 	            success: function (msg) {
-	                setChargeManTextbox(jQuery.parseJSON(msg.d));
+	                 updateWorkingTeamShiftLog(jQuery.parseJSON(msg.d));
 	            }
 	        });
 	    }
 
-	    // 设置班组负责人文本框
-	    function setChargeManTextbox(json) {
-	        $('#chargeMan').combobox('setText', json.ID + "  " + json.Name);
-	        $('#chargeMan').combobox('setValue', json.ID);
+        // 更新交接班界面
+	    function updateWorkingTeamShiftLog(json) {
+	        $('#time').textbox('setText',json.ShiftDate);
+	        $('#shifts').combobox('setText', json.Shifts);
+	        $('#workingTeam').combobox('setText', json.WorkingTeam);
+	        $('#chargeMan').combobox('setText', json.ChargeManID + "  " + json.ChargeManName);
+	        $('#performToObjectives').val(json.PerformToObjectives);
+	        $('#problemsAndSettlements').val(json.ProblemsAndSettlements);
+	        $('#equipmentSituation').val(json.EquipmentSituation);
+	        $('#advicesToNextShift').val(json.AdvicesToNextShift);
 	    }
 
-	    // 生成操作员选择grid
-	    function getDCSSystem() {
-	        var queryUrl = 'HandoverLoger.aspx/GetDCSSystemWithDataGridFormat';
-	        var dataToSend = '{organizationId: "' + organizationId + '"}';
+
+	    // 获取操作员记录
+	    function getOperatorsLog() {
+	        var queryUrl = 'HandoverLogDetail.aspx/GetOperatorsLog';
+	        var dataToSend = '{workingTeamShiftLogId: "' + workingTeamShiftLogId + '"}';
 
 	        $.ajax({
 	            type: "POST",
@@ -282,6 +290,14 @@
 	        $('#ecAlarmLoger').datagrid({
 	            data: json
 	        });
+	    }
+
+	    // 取消选中
+	    function UnselectAll() {
+	        $('#operatorSelector').datagrid('unselectAll');
+	        $('#haltLoger').datagrid('unselectAll');
+	        $('#dcsWarningLoger').datagrid('unselectAll');
+	        $('#ecAlarmLoger').datagrid('unselectAll');
 	    }
 
 	</script>

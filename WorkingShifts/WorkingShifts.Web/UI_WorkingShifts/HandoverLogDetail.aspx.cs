@@ -1,4 +1,5 @@
 ﻿using EasyUIJsonParser;
+using EasyUIJsonParser.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -23,8 +24,26 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         //{
         //    DataTable dt = WorkingShiftsService.();
         //    return DataGridJsonParser.DataTableToJson(dt);
-        //}
+        //}]
 
+        /// <summary>
+        /// 获取交接班日志信息
+        /// </summary>
+        /// <param name="workingTeamShiftLogId"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public static string GetWorkingTeamShiftLog(string workingTeamShiftLogId)
+        {
+            DataTable dt = WorkingShiftsService.GetWorkingTeamShiftLog(workingTeamShiftLogId);
+            return JsonHelper.DataTableFirstRowToJson(dt);
+        }
+
+        [WebMethod]
+        public static string GetOperatorsLog(string workingTeamShiftLogId)
+        {
+            DataTable dt = WorkingShiftsService.GetOperatorsLogHorizontal(workingTeamShiftLogId);
+            return DataGridJsonParser.DataTableToJson(dt);
+        }
 
         /// <summary>
         /// 获取停机记录
