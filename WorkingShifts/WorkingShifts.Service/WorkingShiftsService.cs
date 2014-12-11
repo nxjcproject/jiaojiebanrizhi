@@ -184,6 +184,38 @@ namespace WorkingShifts.Service
         }
 
         /// <summary>
+        /// 按分厂与起止时间查询交接班日志
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="startTime"></param>
+        /// <param name="endTime"></param>
+        /// <returns></returns>
+        public static DataTable GetWorkingTeamShiftLogs(string organizationId, DateTime startTime, DateTime endTime)
+        {
+            DataTable result = new DataTable();
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = @"SELECT   shift_WorkingTeamShiftLog.*
+                                        FROM      shift_WorkingTeamShiftLog
+                                        WHERE   (OrganizationID = @organizationId) AND (ShiftDate > @startTime) AND (ShiftDate < @endTime)";
+
+                command.Parameters.Add(new SqlParameter("organizationId", organizationId));
+                command.Parameters.Add(new SqlParameter("startTime", startTime));
+                command.Parameters.Add(new SqlParameter("endTime", endTime));
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(result);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// 按交接班记录ID获取操作员记录（纵表）
         /// </summary>
         /// <param name="workingTeamShiftLogId"></param>

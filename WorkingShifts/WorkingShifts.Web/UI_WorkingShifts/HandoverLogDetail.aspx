@@ -11,15 +11,11 @@
 	<link rel="stylesheet" type="text/css" href="/lib/ealib/themes/icon.css"/>
     <link rel="stylesheet" type="text/css" href="/lib/extlib/themes/syExtIcon.css"/>
     <link rel="stylesheet" type="text/css" href="/lib/extlib/themes/syExtCss.css"/>
-
+    
 	<script type="text/javascript" src="/lib/ealib/jquery.min.js" charset="utf-8"></script>
 	<script type="text/javascript" src="/lib/ealib/jquery.easyui.min.js" charset="utf-8"></script>
     <script type="text/javascript" src="/lib/ealib/easyui-lang-zh_CN.js" charset="utf-8"></script>
-
-    <script type="text/javascript" src="/lib/ealib/extend/jquery.PrintArea.js" charset="utf-8"></script> 
-    <script type="text/javascript" src="/lib/ealib/extend/jquery.jqprint.js" charset="utf-8"></script>
-
-    <script type="text/javascript" src="/js/common/PrintFile.js" charset="utf-8"></script> 
+    <script type="text/javascript" src="/js/common/jquery.utility.js"></script>
 </head>
 <body>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
@@ -154,8 +150,8 @@
 	</div>
 	<script type="text/javascript">
 
-	    var organizationId = 'C41B1F47-A48A-495F-A890-0AABB2F3BFF7';
-	    var workingTeamShiftLogId = '7740FE1A-3E6C-4C25-89FF-D08C6EE3E995';
+	    var organizationId = $.getUrlParam('organizationId'); //'C41B1F47-A48A-495F-A890-0AABB2F3BFF7'; //测试用
+	    var workingTeamShiftLogId = $.getUrlParam('workingTeamShiftLogId'); //'7740FE1A-3E6C-4C25-89FF-D08C6EE3E995'; //测试用
 
 	    $(document).ready(function () {
 	        // 获取交接班日志
