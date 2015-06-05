@@ -21,6 +21,23 @@
     <script type="text/javascript" src="/js/common/PrintFile.js" charset="utf-8"></script> 
 </head>
 <body>
+    
+    <script>
+        //首先获得分厂的组织机构ID
+        var organizationId = 'zc_nxjc_byc_byf';
+        var queryUrl = 'HandoverLoger.aspx/GetAppSettingValue';
+        $.ajax({
+            type: "POST",
+            url: queryUrl,
+            data: '',
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            success: function (msg) {
+                organizationId = msg.d;
+                getStaffInfo();
+            }
+        });
+    </script>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
         <div class="easyui-panel" style="padding:5px;width:100%;">
             <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a>
@@ -35,6 +52,7 @@
 		            <option value="B">乙班</option>
 		            <option value="C">丙班</option>
                 </select>
+                <a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="RefreshFun();">刷新</a>
             </div>
             <div style="float:right;">
                 当前班组：
@@ -262,27 +280,55 @@
 	</div>
 	<script type="text/javascript">
 
-	    var organizationId = 'C41B1F47-A48A-495F-A890-0AABB2F3BFF7';
-	    var staffInfo;
+	    
+	    var staffInfo;//
+	    var shiftTimeInfo;//时间班的起止时间信息
 	    var machineHaltReasons;
 
 	    $(document).ready(function () {
+	        //初始化
+	        init();
+	    });
+        
+	    function init() {
+	        osEditIndex = undefined;//初始化为undefined	              
 	        // 初始化班组下拉列表
 	        initializeWorkingTeam();
-            // 初始职工人员列表
+	        // 初始职工人员列表
 	        initializeStaffInfo();
 	        // 初始负责人下拉列表
 	        initializeChargManCombobox();
+	        //获取停机原因信息
+	        // getMachineHaltReasons();
 	        // 获取DCS系统信息
 	        getDCSSystem();
+	        //获取班次时间信息
+	        getShiftTime();
 	        // 获取停机记录
 	        getHaltLog();
 	        // 获取报警记录
 	        getWarningLog();
-            // 获取能耗报警记录
+	        // 获取能耗报警记录
 	        getEnergyConsumptionAlarmLog();
-	    });
-
+	    }
+	    //刷新
+	    function RefreshFun() {
+	        init();
+	    }
+	    function getFactoryOrganizationID() {
+	        var queryUrl = 'HandoverLoger.aspx/GetAppSettingValue';
+	        $.ajax({
+	            type: "POST",
+	            url: queryUrl,
+	            data: '',
+	            contentType: "application/json; charset=utf-8",
+	            dataType: "json",
+	            success: function (msg) {
+	                organizationId = msg.d;
+	                initDelay();
+	            }
+	        });
+	    }
 	    // 初始化班组下拉列表
 	    function initializeWorkingTeam() {
 	        var queryUrl = 'HandoverLoger.aspx/GetWorkingTeamWithComboboxFormat';
@@ -306,7 +352,7 @@
 
         // 获取员工信息
 	    function getStaffInfo() {
-	        if (staffInfo == null) {
+	        if (staffInfo == null || staffInfo == '[]') {
 	            var queryUrl = 'HandoverLoger.aspx/GetStaffInfoWithComboboxFormat';
 	            var dataToSend = '{organizationId: "' + organizationId + '"}';
 
@@ -324,8 +370,24 @@
 	        }
 
 	        return staffInfo;
+	    }	   
+        //获取班次时间
+	    function getShiftTime() {
+	        var shift = $("#shifts").combobox('getText');
+	        var queryUrl = 'HandoverLoger.aspx/GetShiftTimeInfo';
+	        var dataToSend = '{organizationId: "' + organizationId +'",shift:"'+shift+ '"}';
+	        $.ajax({
+	            type: "POST",
+	            url: queryUrl,
+	            data: dataToSend,
+	            contentType: "application/json; charset=utf-8",
+	            dataType: "json",
+	            async: false,
+	            success: function (msg) {
+	                shiftTimeInfo = jQuery.parseJSON(msg.d);
+	            }
+	        });
 	    }
-
 	    // 初始职工人员列表
 	    function initializeStaffInfo() {
 	        getStaffInfo();
@@ -468,7 +530,7 @@
 	    // 停机原因选择
 	    function getHaltLog() {
 	        var queryUrl = 'HandoverLoger.aspx/GetMachineHaltLogWithDataGridFormat';
-	        var dataToSend = '{organizationId: "' + organizationId + '"}';
+	        var dataToSend = '{organizationId: "' + organizationId +'",startTime:"'+shiftTimeInfo.startTime+'",endTime:"'+shiftTimeInfo.endTime+ '"}';
 
 	        $.ajax({
 	            type: "POST",
@@ -533,8 +595,8 @@
 	    // 生成报警信息grid
 	    function getWarningLog() {
 	        var queryUrl = 'HandoverLoger.aspx/GetDCSWarningLogWithDataGridFormat';
-	        var dataToSend = '{organizationId: "' + organizationId + '"}';
-
+	        //var dataToSend = '{organizationId: "' + organizationId + '"}';
+	        var dataToSend = '{organizationId: "' + organizationId + '",startTime:"' + shiftTimeInfo.startTime + '",endTime:"' + shiftTimeInfo.endTime + '"}';
 	        $.ajax({
 	            type: "POST",
 	            url: queryUrl,
@@ -589,8 +651,8 @@
 	    // 生成能耗报警信息
 	    function getEnergyConsumptionAlarmLog() {
 	        var queryUrl = 'HandoverLoger.aspx/GetEnergyConsumptionAlarmLogWithDataGridFormat';
-	        var dataToSend = '{organizationId: "' + organizationId + '"}';
-
+	        //var dataToSend = '{organizationId: "' + organizationId + '"}';
+	        var dataToSend = '{organizationId: "' + organizationId + '",startTime:"' + shiftTimeInfo.startTime + '",endTime:"' + shiftTimeInfo.endTime + '"}';
 	        $.ajax({
 	            type: "POST",
 	            url: queryUrl,

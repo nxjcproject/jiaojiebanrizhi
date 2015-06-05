@@ -20,7 +20,9 @@
 <body>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
+            
             <div style="float:left;">
+                <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-back'" onclick="javascript:history.go(-1)" >返回</a>
                 时间：
                 <input id="time" class="easyui-textbox" readonly="true" style="width:180px;" />
                 班次：

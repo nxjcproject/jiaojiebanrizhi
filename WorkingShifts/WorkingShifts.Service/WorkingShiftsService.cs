@@ -116,7 +116,7 @@ namespace WorkingShifts.Service
         public static void CreateOperatorLogFromJson(string workingTeamShiftLogID, string json)
         {
             string[] operatorJsons = json.JsonPickArray("rows");
-
+            
             foreach (string operatorJson in operatorJsons)
             {
                 string organizationId = operatorJson.JsonPick("OrganizationID");
@@ -229,11 +229,11 @@ namespace WorkingShifts.Service
             {
                 SqlCommand command = connection.CreateCommand();
                 command.CommandText = @"SELECT   shift_OperatorsLog.*, system_StaffInfo.Name AS StaffName, 
-                                                        system_Organization_Instrumentation.Name AS DCSName
+                                                        system_Organization.Name AS DCSName
                                         FROM      system_StaffInfo INNER JOIN
                                                         shift_OperatorsLog ON system_StaffInfo.StaffInfoID = shift_OperatorsLog.StaffID INNER JOIN
-                                                        system_Organization_Instrumentation ON 
-                                                        shift_OperatorsLog.OrganizationID = system_Organization_Instrumentation.OrganizationID
+                                                        system_Organization ON 
+                                                        shift_OperatorsLog.OrganizationID = system_Organization.OrganizationID
                                         WHERE   (shift_OperatorsLog.WorkingTeamShiftLogID = @workingTeamShiftLogId)";
 
                 command.Parameters.Add(new SqlParameter("workingTeamShiftLogId", workingTeamShiftLogId));

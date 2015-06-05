@@ -23,9 +23,13 @@ namespace WorkingShifts.Service
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            Query query = new Query("system_MachineHaltReason");
+            //Query query = new Query("system_MachineHaltReason");
+            string mySql = @"SELECT  RTRIM(LTRIM(MachineHaltReasonID)) AS MachineHaltReasonID, ReasonText, Remarks
+                                FROM system_MachineHaltReason AS A
+                                WHERE A.Enabled='true'
+                                order by A.MachineHaltReasonID";
 
-            return factory.Query(query);
+            return factory.Query(mySql);
         }
 
         /// <summary>
@@ -34,23 +38,70 @@ namespace WorkingShifts.Service
         /// <param name="organizationId">组织机构ID</param>
         /// <param name="workingTeamShiftLogID">交接班日志ID</param>
         /// <returns></returns>
-        public static DataTable GetMachineHaltLog(string organizationId, string workingTeamShiftLogID = "")
+        public static DataTable GetMachineHaltLog(string organizationId, string startTime, string endTime, string workingTeamShiftLogID = "")
         {
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            Query query = new Query("shift_MachineHaltLog");
-            query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+            //Query query = new Query("shift_MachineHaltLog");
+            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
 
-            if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
-                query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
-            else
-                query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
-
-            DataTable dt = factory.Query(query);
+            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
+            //else
+            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+            string mySql = @"SELECT A.* 
+                                FROM shift_MachineHaltLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
+                                AND (A.HaltTime>=CONVERT(varchar(10),GETDATE(),20)+' {0}'
+                                AND A.HaltTime<=CONVERT(varchar(10),GETDATE(),20)+' {1}')";
+            if (endTime == "24:00")
+                endTime = "23:59";
+            DataTable dt = factory.Query(string.Format(mySql,startTime,endTime,organizationId));
             return dt;
         }
 
+        /// <summary>
+        /// 获取停机记录
+        /// </summary>
+        /// <param name="organizationId">组织机构ID</param>
+        /// <param name="workingTeamShiftLogID">交接班日志ID</param>
+        /// <returns></returns>
+        public static DataTable GetMachineHaltLog(string organizationId,string workingTeamShiftLogID = "")
+        {
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
+
+            ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
+            //Query query = new Query("shift_MachineHaltLog");
+            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+
+            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
+            //else
+            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+            string mySql;
+            if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            {
+                mySql = @"SELECT A.* 
+                                FROM shift_MachineHaltLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID=@OrganizationID)+'%'
+                                AND CONVERT(varchar(10),A.HaltTime,20)=CONVERT(varchar(10),GETDATE(),20)";
+            }
+            else
+            {
+                mySql = @"SELECT A.* 
+                                FROM shift_MachineHaltLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID=@OrganizationID)+'%'                               
+                                AND WorkingTeamShiftLogID='" + workingTeamShiftLogID + "'";  
+            }
+
+            SqlParameter parameters =new SqlParameter("OrganizationID", organizationId);
+            DataTable dt = factory.Query(mySql,parameters);
+            return dt;
+        }
         /// <summary>
         /// 更新指定停机记录
         /// </summary>

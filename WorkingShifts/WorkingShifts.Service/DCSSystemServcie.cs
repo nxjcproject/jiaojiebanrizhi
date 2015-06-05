@@ -28,9 +28,9 @@ namespace WorkingShifts.Service
             {
                 SqlCommand command = connection.CreateCommand();
                 command.CommandText = @"SELECT * 
-                                        FROM [dbo].[system_Organization_Instrumentation] 
+                                        FROM [dbo].[system_Organization] 
                                         WHERE LEN([LevelCode]) = 7 AND [LevelCode] LIKE (
-                                            (SELECT [LevelCode] FROM [dbo].[system_Organization_Instrumentation] 
+                                            (SELECT [LevelCode] FROM [dbo].[system_Organization] 
                                             WHERE [OrganizationID] = @organizationId) 
                                             + '%' 
                                         )";
@@ -54,17 +54,57 @@ namespace WorkingShifts.Service
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            Query query = new Query("shift_DCSWarningLog");
-            query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+            //Query query = new Query("shift_DCSWarningLog");
+            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
 
-            if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
-                query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
-            else
-                query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
+            //else
+            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
 
-            return factory.Query(query);
+            //return factory.Query(query);
+            string mySql = @"SELECT A.* 
+                                FROM shift_DCSWarningLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID=@OrganizationID)+'%'
+                                AND CONVERT(varchar(10),A.StartingTime,20)=CONVERT(varchar(10),GETDATE(),20)";
+            SqlParameter parameter = new SqlParameter("OrganizationID", organizationId);
+            DataTable dt = factory.Query(mySql, parameter);
+            return dt;
         }
+        /// <summary>
+        /// 获取DCS报警记录
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="workingTeamShiftLogID"></param>
+        /// <returns></returns>
+        public static DataTable GetDCSWarningLog(string organizationId,string startTime,string endTime, string workingTeamShiftLogID = "")
+        {
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
+            ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
+            //Query query = new Query("shift_DCSWarningLog");
+            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+
+            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
+            //else
+            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+
+            //return factory.Query(query);
+            string mySql = @"SELECT A.* 
+                                FROM shift_DCSWarningLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
+                                AND (A.StartingTime>=CONVERT(varchar(10),GETDATE(),20)+' {0}'
+                                AND A.StartingTime<=CONVERT(varchar(10),GETDATE(),20)+' {1}')";
+            if (endTime == "24:00")
+                endTime = "23:59";
+            DataTable dt = factory.Query(string.Format(mySql, startTime, endTime, organizationId));
+            //SqlParameter parameter = new SqlParameter("OrganizationID", organizationId);
+            //DataTable dt = factory.Query(mySql, parameter);
+            return dt;
+        }
         /// <summary>
         /// 更新DCS报警记录
         /// </summary>

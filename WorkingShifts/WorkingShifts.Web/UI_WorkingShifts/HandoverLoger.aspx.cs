@@ -1,6 +1,7 @@
 ﻿using EasyUIJsonParser;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Linq;
 using System.Web;
@@ -15,7 +16,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            
         }
 
         #region Create
@@ -116,6 +117,13 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             DataTable dt = DCSSystemServcie.GetDCSSystemByOrganizationId(organizationId);
             return DataGridJsonParser.DataTableToJson(dt, "Name", "OrganizationID");
         }
+        //获取班次时间
+        [WebMethod]
+        public static string GetShiftTimeInfo(string organizationId,string shift)
+        {
+            string json=ShiftTimeService.GetShiftTime(organizationId, shift);
+            return json;
+        }
 
         /// <summary>
         /// 获取DCS报警记录
@@ -123,9 +131,9 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         /// <param name="organizationId"></param>
         /// <returns></returns>
         [WebMethod]
-        public static string GetDCSWarningLogWithDataGridFormat(string organizationId)
+        public static string GetDCSWarningLogWithDataGridFormat(string organizationId,string startTime,string endTime)
         {
-            DataTable dt = DCSSystemServcie.GetDCSWarningLog(organizationId);
+            DataTable dt = DCSSystemServcie.GetDCSWarningLog(organizationId,startTime,endTime);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 
@@ -137,7 +145,9 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         public static string GetMachineHaltReasonsWithCombotreeFormat()
         {
             DataTable dt = MachineHaltService.GetMachineHaltReasons();
-            return TreeJsonParser.DataTableToJsonByLevelCode(dt, "MachineHaltReasonID", "ReasonText", "Remarks");
+            string json=TreeJsonParser.DataTableToJsonByLevelCode(dt, "MachineHaltReasonID", "ReasonText", "Remarks");
+            return json;
+           // return EasyUIJsonParser.ComboboxJsonParser.DataTableToJson(dt, "MachineHaltReasonID", "ReasonText", "Remarks");
         }
 
         /// <summary>
@@ -146,9 +156,9 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         /// <param name="organizationId"></param>
         /// <returns></returns>
         [WebMethod]
-        public static string GetMachineHaltLogWithDataGridFormat(string organizationId)
+        public static string GetMachineHaltLogWithDataGridFormat(string organizationId,string startTime,string endTime)
         {
-            DataTable dt = MachineHaltService.GetMachineHaltLog(organizationId);
+            DataTable dt = MachineHaltService.GetMachineHaltLog(organizationId,startTime,endTime);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 
@@ -158,10 +168,19 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         /// <param name="organizationId"></param>
         /// <returns></returns>
         [WebMethod]
-        public static string GetEnergyConsumptionAlarmLogWithDataGridFormat(string organizationId)
+        public static string GetEnergyConsumptionAlarmLogWithDataGridFormat(string organizationId, string startTime, string endTime)
         {
-            DataTable dt = EnergyConsumptionAlarmLogService.GetEnergyConsumptionAlarmLog(organizationId);
+            DataTable dt = EnergyConsumptionAlarmLogService.GetEnergyConsumptionAlarmLog(organizationId, startTime,endTime);
             return DataGridJsonParser.DataTableToJson(dt);
+        }
+        /// <summary>
+        /// 读取分厂的OrganizationID
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public static string GetAppSettingValue()
+        {
+            return ConfigurationManager.AppSettings["StationId"];
         }
 
         #endregion

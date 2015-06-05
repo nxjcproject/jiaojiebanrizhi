@@ -15,11 +15,12 @@ namespace WorkingShifts.Web.UI_WorkingShifts
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+           
             if (!IsPostBack)
             {
 #if DEBUG
                 // 调试用,自定义的数据授权
-                List<string> m_DataValidIdItems = new List<string>() { "O0101", "O0102" };
+                List<string> m_DataValidIdItems = new List<string>() { "O03", "O0102" };
                 AddDataValidIdGroup("ProductionOrganization", m_DataValidIdItems);
 #endif
                 this.OrganisationTree.Organizations = GetDataValidIdGroup("ProductionOrganization");                 //向web用户控件传递数据授权参数

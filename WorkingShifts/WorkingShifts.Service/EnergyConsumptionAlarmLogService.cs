@@ -25,18 +25,52 @@ namespace WorkingShifts.Service
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            Query query = new Query("shift_EnergyConsumptionAlarmLog");
-            query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+            //Query query = new Query("shift_EnergyConsumptionAlarmLog");
+            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
 
-            if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
-                query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
-            else
-                query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
+            //else
+            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+            string mySql = @"SELECT A.* 
+                                FROM shift_EnergyConsumptionAlarmLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{0}')+'%'
+                                AND CONVERT(varchar(10),A.StartTime,20)=CONVERT(varchar(10),GETDATE(),20)";
 
-            DataTable dt = factory.Query(query);
+            DataTable dt = factory.Query(string.Format(mySql,organizationId));
             return dt;
         }
+        /// <summary>
+        /// 获取能耗报警记录
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="workingTeamShiftLogID"></param>
+        /// <returns></returns>
+        public static DataTable GetEnergyConsumptionAlarmLog(string organizationId,string startTime,string endTime, string workingTeamShiftLogID = "")
+        {
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
+            ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
+            //Query query = new Query("shift_EnergyConsumptionAlarmLog");
+            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+
+            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
+            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
+            //else
+            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
+            string mySql = @"SELECT A.* 
+                                FROM shift_EnergyConsumptionAlarmLog AS A,system_Organization AS B
+                                WHERE A.OrganizationID=B.OrganizationID
+                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
+                                AND(A.StartTime>=CONVERT(varchar(10),GETDATE(),20)+' {0}'
+                                AND A.StartTime<=CONVERT(varchar(10),GETDATE(),20)+' {1}')";
+            if (endTime == "24:00")
+                endTime = "23:59";
+            DataTable dt = factory.Query(string.Format(mySql, startTime, endTime, organizationId));
+            //DataTable dt = factory.Query(string.Format(mySql, organizationId));
+            return dt;
+        }
         /// <summary>
         /// 更新能耗报警记录
         /// </summary>
