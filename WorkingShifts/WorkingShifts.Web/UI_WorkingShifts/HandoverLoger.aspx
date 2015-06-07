@@ -19,6 +19,9 @@
     <script type="text/javascript" src="/lib/ealib/extend/jquery.jqprint.js" charset="utf-8"></script>
 
     <script type="text/javascript" src="/js/common/PrintFile.js" charset="utf-8"></script> 
+
+    <!-- 盘库js -->
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/Stocktaking.js" charset="utf-8"></script>
 </head>
 <body>
     
@@ -40,7 +43,8 @@
     </script>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
         <div class="easyui-panel" style="padding:5px;width:100%;">
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。" onclick="OpenDlgStocktaking()">盘库信息</a>
         </div>
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
             <div style="float:left;">
@@ -278,6 +282,45 @@
             <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a>
         </div>
 	</div>
+    <div id="dlgStocktaking" class="easyui-dialog" title="盘库信息" style="width:700px;height:400px;" 
+        data-options="
+            iconCls:'icon-filter',
+            modal:true,
+            closed:true,
+        	buttons: [{
+		        text:'确认',
+		        iconCls:'icon-ok',
+		        handler:function(){
+			        $('#dlgStocktaking').dialog('close');
+		        }
+	        }]
+        ">
+        <!--盘库信息DataGrid-->
+	    <table id="dgStocktaking" class="easyui-datagrid"
+			    data-options="
+                    fill: true,
+				    iconCls: 'icon-edit',
+				    singleSelect: true,
+				    onClickRow: stOnClickRow,
+                    toolbar: '#tbdgStocktaking'
+			    ">
+		    <thead>
+			    <tr>
+                    <th data-options="field:'OrganizationID',hidden:true">OrganizationID</th>
+                    <th data-options="field:'VariableId',hidden:true">VariableId</th>
+				    <th data-options="field:'Name',width:120">物料名称</th>
+                    <th data-options="field:'Unit',width:40">单位</th>
+				    <th data-options="field:'CumulantLastClass',width:150">本班</th>
+                    <th data-options="field:'DataValue',width:150,editor:{type:'numberbox',options:{min:0,precision:4}}">修正值</th>
+                    <th data-options="field:'Remark',width:150,editor:{type:'text'}">备注</th>
+			    </tr>
+		    </thead>
+	    </table>
+        <div id="tbdgStocktaking" style="height:auto">
+		    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="stAccept()">应用</a>
+		    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="stReject()">取消</a>
+	    </div>
+    </div>
 	<script type="text/javascript">
 
 	    
@@ -748,8 +791,8 @@
 	    function submit() {
 
 	        AcceptAll();
-	        if (Validate() == false)
-	            return;
+	        //if (Validate() == false)
+	            //return;
 
 	        $.messager.confirm('确认', '确认提交交接班日志？', function (r) {
 	            if (r) {
@@ -762,13 +805,14 @@
 	                var haltLogs = "\"haltLogs\":" + (JSON.stringify($('#haltLoger').datagrid('getData')));
 	                var dcsWarningLogs = "\"dcsWarningLogs\":" + (JSON.stringify($('#dcsWarningLoger').datagrid('getData')));
 	                var ecAlarmLogs = "\"energyConsumptionAlarmLogs\":" + (JSON.stringify($('#ecAlarmLoger').datagrid('getData')));
+	                var stocktakingInfos = "\"stocktakingInfos\":" + (JSON.stringify($('#dgStocktaking').datagrid('getData')));
 
 	                var performToObjectives = "\"performToObjectives\":\"" + $('#performToObjectives').val() + "\"";
 	                var problemsAndSettlements = "\"problemsAndSettlements\":\"" + $('#problemsAndSettlements').val() + "\"";
 	                var equipmentSituation = "\"equipmentSituation\":\"" + $('#equipmentSituation').val() + "\"";
 	                var advicesToNextShift = "\"advicesToNextShift\":\"" + $('#advicesToNextShift').val() + "\"";
 
-	                var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' +
+	                var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' + stocktakingInfos + ','
                         performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
 
 	                var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';

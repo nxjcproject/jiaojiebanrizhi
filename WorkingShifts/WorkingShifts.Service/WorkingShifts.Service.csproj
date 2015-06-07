@@ -51,6 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShiftTimeService.cs" />
     <Compile Include="StaffService.cs" />
+    <Compile Include="StocktakingService.cs" />
     <Compile Include="WorkingShiftsService.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,8 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         [WebMethod]
         public static string CreateWorkingTeamShiftLog(string organizationId, string json)
         {
+            // todo: 应作为事务添加！
+
             string time = json.JsonPick("time");
             string shifts = json.JsonPick("shifts");
             string workingTeam = json.JsonPick("workingTeam");
@@ -38,6 +40,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             string haltLogs = json.JsonPick("haltLogs");
             string dcsWarningLogs = json.JsonPick("dcsWarningLogs");
             string energyConsumptionAlarmLogs = json.JsonPick("energyConsumptionAlarmLogs");
+            string stocktakingInfos = json.JsonPick("stocktakingInfos");
             string performToObjectives = json.JsonPick("performToObjectives");
             string problemsAndSettlements = json.JsonPick("problemsAndSettlements");
             string equipmentSituation = json.JsonPick("equipmentSituation");
@@ -53,6 +56,8 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             DCSSystemServcie.UpdateDCSWarningLogFromJson(workingTeamShiftLogID, dcsWarningLogs);
             // 更新能耗报警记录
             EnergyConsumptionAlarmLogService.UpdateEnergyConsumptionAlarmLogFromJson(workingTeamShiftLogID, energyConsumptionAlarmLogs);
+            // 添加盘库信息
+            StocktakingService.SaveStocktakingInfo(workingTeamShiftLogID, shifts, stocktakingInfos);
 
             return "success";
         }
@@ -173,6 +178,19 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             DataTable dt = EnergyConsumptionAlarmLogService.GetEnergyConsumptionAlarmLog(organizationId, startTime,endTime);
             return DataGridJsonParser.DataTableToJson(dt);
         }
+
+        /// <summary>
+        /// 获取原始盘库信息
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public static string GetOriginalStocktakingInfoWithDataGridFormat(string organizationId)
+        {
+            DataTable dt = StocktakingService.GetOriginalStocktakingInfo(organizationId);
+            return DataGridJsonParser.DataTableToJson(dt);
+        }
+
         /// <summary>
         /// 读取分厂的OrganizationID
         /// </summary>

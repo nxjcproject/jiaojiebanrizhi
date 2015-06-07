@@ -1587,6 +1587,8 @@
     <Content Include="UI_WorkingShifts\HandoverLog.aspx" />
     <Content Include="UI_WorkingShifts\HandoverLogDetail.aspx" />
     <Content Include="UI_WorkingShifts\HandoverLoger.aspx" />
+    <Content Include="UI_WorkingShifts\js\page\HandoverLoger.js" />
+    <Content Include="UI_WorkingShifts\js\page\Stocktaking.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

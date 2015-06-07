@@ -1,0 +1,33 @@
+﻿
+.ComprehensiveInformation_Value {
+    width:140px;
+    height:18px;
+    text-align:right;
+    font-size:9pt;
+}
+.ComprehensiveInformation_ValueL {
+    width:200px;
+    text-align:right;
+    font-size:9pt;
+}
+
+.WorkingShift_Text {
+}
+
+.DispatchingLogStatusPic {
+    width:150px;
+    height:150px;
+    text-align:center;
+    vertical-align:middle;
+    padding-top:35px;
+    font-size:12pt;
+    font-weight:bold;
+    color:#ff6a00;
+    background-repeat: no-repeat
+}
+.DispatchingLogHorizontalBlank {
+    width:20px;
+}
+.DispatchingLogverticalBlank {
+    height:30px;
+}
