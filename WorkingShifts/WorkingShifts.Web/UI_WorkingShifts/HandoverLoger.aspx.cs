@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Transactions;
 using System.Web;
 using System.Web.Services;
 using System.Web.UI;
@@ -30,7 +31,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         [WebMethod]
         public static string CreateWorkingTeamShiftLog(string organizationId, string json)
         {
-            // todo: 应作为事务添加！
+            // todo: 事务处理应放在服务层，重构时应优化。
 
             string time = json.JsonPick("time");
             string shifts = json.JsonPick("shifts");
@@ -46,18 +47,23 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             string equipmentSituation = json.JsonPick("equipmentSituation");
             string advicesToNextShift = json.JsonPick("advicesToNextShift");
 
-            // 创建交接班日志主表记录
-            string workingTeamShiftLogID = WorkingShiftsService.CreateShiftLog(organizationId, time, shifts, workingTeam, chargeMan, performToObjectives, problemsAndSettlements, equipmentSituation, advicesToNextShift);
-            // 添加操作员记录
-            WorkingShiftsService.CreateOperatorLogFromJson(workingTeamShiftLogID, operators);
-            // 更新停机原因
-            MachineHaltService.UpdateMachineHaltLogFromJson(workingTeamShiftLogID, haltLogs);
-            // 更新DCS报警记录
-            DCSSystemServcie.UpdateDCSWarningLogFromJson(workingTeamShiftLogID, dcsWarningLogs);
-            // 更新能耗报警记录
-            EnergyConsumptionAlarmLogService.UpdateEnergyConsumptionAlarmLogFromJson(workingTeamShiftLogID, energyConsumptionAlarmLogs);
-            // 添加盘库信息
-            StocktakingService.SaveStocktakingInfo(workingTeamShiftLogID, shifts, stocktakingInfos);
+            using (TransactionScope tsCope = new TransactionScope())
+            {
+                // 创建交接班日志主表记录
+                string workingTeamShiftLogID = WorkingShiftsService.CreateShiftLog(organizationId, time, shifts, workingTeam, chargeMan, performToObjectives, problemsAndSettlements, equipmentSituation, advicesToNextShift);
+                // 添加操作员记录
+                WorkingShiftsService.CreateOperatorLogFromJson(workingTeamShiftLogID, operators);
+                // 更新停机原因
+                MachineHaltService.UpdateMachineHaltLogFromJson(workingTeamShiftLogID, haltLogs);
+                // 更新DCS报警记录
+                DCSSystemServcie.UpdateDCSWarningLogFromJson(workingTeamShiftLogID, dcsWarningLogs);
+                // 更新能耗报警记录
+                EnergyConsumptionAlarmLogService.UpdateEnergyConsumptionAlarmLogFromJson(workingTeamShiftLogID, energyConsumptionAlarmLogs);
+                // 添加盘库信息
+                StocktakingService.SaveStocktakingInfo(workingTeamShiftLogID, shifts, stocktakingInfos);
+
+                tsCope.Complete();
+            }
 
             return "success";
         }
