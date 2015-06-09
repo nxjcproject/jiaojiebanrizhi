@@ -830,6 +830,9 @@
 	                                window.location.href = 'HandoverLoger.aspx';
 	                            });
 	                        }
+	                    },
+	                    error: function (msg) {
+	                        $.messager.alert('提示', '日志创建失败，错误原因：' + jQuery.parseJSON(msg.responseText).Message, 'error');
 	                    }
 	                });
 	            }

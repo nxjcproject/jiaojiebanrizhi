@@ -15,6 +15,37 @@ namespace WorkingShifts.Service
     public class WorkingShiftsService
     {
         /// <summary>
+        /// 交接班日志是否已存在
+        /// </summary>
+        /// <param name="organizationId">组织机构ID</param>
+        /// <param name="datetime">日期，格式：yyyy-MM-dd</param>
+        /// <param name="shifts">时间班（甲班、乙班、丙班）</param>
+        /// <returns></returns>
+        public static bool IsShiftLogExisit(string organizationId, string datetime, string shifts)
+        {
+            int count = 0;
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
+            DateTime date = DateTime.Parse(datetime);
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = @"SELECT COUNT(*)
+                                          FROM [NXJC].[dbo].[shift_WorkingTeamShiftLog]
+                                         WHERE [OrganizationID] = @organizationId AND
+	                                           CONVERT(varchar(10),[ShiftDate],120) = @date AND
+	                                           [Shifts] = @shifts";
+
+                command.Parameters.Add(new SqlParameter("organizationId", organizationId));
+                command.Parameters.Add(new SqlParameter("date", date.ToString("yyyy-MM-dd")));
+                command.Parameters.Add(new SqlParameter("shifts", shifts));
+                connection.Open();
+                count = (int)command.ExecuteScalar();
+            }
+
+            return count > 0;
+        }
+
+        /// <summary>
         /// 创建交接班日志
         /// </summary>
         /// <param name="organizationId">组织机构ID</param>
@@ -29,6 +60,11 @@ namespace WorkingShifts.Service
         /// <returns>交接班日志ID</returns>
         public static string CreateShiftLog(string organizationId, string datetime, string shifts, string workingTeam, string chargeManId, string performToObjectives, string problemsAndSettlements, string equipmentSituation, string advicesToNextShift)
         {
+
+            // 检查是否有重复提交
+            if (IsShiftLogExisit(organizationId, datetime, shifts))
+                throw new ApplicationException("交接班日志已存在。");
+
             string workingTeamShiftLogID = Guid.NewGuid().ToString();
 
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
