@@ -25,6 +25,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
 #endif
                 this.OrganisationTree.Organizations = GetDataValidIdGroup("ProductionOrganization");                 //向web用户控件传递数据授权参数
                 this.OrganisationTree.PageName = "Edit.aspx";
+                this.OrganisationTree.LeveDepth = 5;
             }
         }
 

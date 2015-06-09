@@ -37,10 +37,10 @@
                                     <td><input id="organizationName" class="easyui-textbox" readonly="readonly" style="width:100px" /></td>
                                     <td style="width:10px;"></td>
                                     <td>开始：</td>
-                                    <td><input id="startTime" class="easyui-datetimebox" style="width:150px" /></td>
+                                    <td><input id="startTime" class="easyui-datebox" style="width:150px" /></td>
                                     <td style="width:10px;"></td>
                                     <td>结束：</td>
-                                    <td><input id="endTime" class="easyui-datetimebox" style="width:150px" /></td>
+                                    <td><input id="endTime" class="easyui-datebox" style="width:150px" /></td>
                                     <td style="width:10px;"></td>
                                     <td><a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="getOperatorsLog()">查询</a></td>
                                 </tr>
