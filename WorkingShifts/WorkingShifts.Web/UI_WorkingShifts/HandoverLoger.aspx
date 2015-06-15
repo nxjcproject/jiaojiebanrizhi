@@ -174,7 +174,6 @@
         <!--操作员DataGrid-->
 	    <table id="operatorSelector" class="easyui-datagrid" style="width:100%;height:100%"
 			    data-options="
-				    iconCls: 'icon-edit',
 				    singleSelect: true,
 				    onClickRow: operatorLoger.OnClickRow
 			    ">

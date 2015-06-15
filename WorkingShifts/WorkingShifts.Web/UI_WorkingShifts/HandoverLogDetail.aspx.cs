@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Services;
 using System.Web.UI;
@@ -36,6 +37,34 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         {
             DataTable dt = WorkingShiftsService.GetWorkingTeamShiftLog(workingTeamShiftLogId);
             return JsonHelper.DataTableFirstRowToJson(dt);
+        }
+
+        [WebMethod]
+        public static string GetWorkingSectionsWithDataColumnFormat(string organizationId)
+        {
+            DataTable dt = OperatorService.GetWorkingSections(organizationId);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[[");
+            sb.Append("{field:'OrganizationID',hidden:true},");
+            sb.Append("{field:'Name',width:100},");
+            foreach (DataRow dr in dt.Rows)
+            {
+                string id = dr["WorkingSectionID"].ToString().Trim().Replace('-', '_');
+                sb.Append("{field:'StaffName_");
+                sb.Append(id);
+                sb.Append("',hidden:true},");
+
+                sb.Append("{field:'StaffID_");
+                sb.Append(id);
+                sb.Append("',width:180,title:'");
+                sb.Append(dr["WorkingSectionName"]);
+                sb.Append("'},");
+            }
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append("]]");
+
+            return sb.ToString();
         }
 
         [WebMethod]

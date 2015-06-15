@@ -19,51 +19,24 @@
 </head>
 <body>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
+        <div class="easyui-panel" style="padding:5px;width:100%;">
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-back'" onclick="javascript:history.go(-1)" >返回</a> | 
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'ext-icon-group'" onclick="$('#dlgOperator').dialog('open')">操作员信息</a>
+        </div>
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
-            
-            <div style="float:left;">
-                <a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-back'" onclick="javascript:history.go(-1)" >返回</a>
+            <div>
                 时间：
-                <input id="time" class="easyui-textbox" readonly="true" style="width:180px;" />
+                <input id="time" class="easyui-textbox" readonly="true" style="width:120px;" />
                 班次：
                 <select id="shifts" class="easyui-combobox" data-options="editable: false" name="state" readonly="true" style="width:80px;">
 		            <option value="A">甲班</option>
 		            <option value="B">乙班</option>
 		            <option value="C">丙班</option>
                 </select>
-            </div>
-            <div style="float:right;">
-                当前班组：
-                <input id="workingTeam" class="easyui-combobox" data-options="valueField:'Name',textField:'Name',editable:false" readonly="true" name="state" style="width:180px;" />
+                班组：
+                <input id="workingTeam" class="easyui-combobox" data-options="valueField:'Name',textField:'Name',editable:false" readonly="true" name="state" style="width:80px;" />
                 负责人：
                 <input id="chargeMan" class="easyui-combobox" data-options="valueField:'StaffID',textField:'Combined'" readonly="true" style="width:180px" />
-            </div>
-            <div style="margin-top: 40px;">
-                <!--操作员DataGrid-->
-	            <table id="operatorSelector" class="easyui-datagrid" title="操作员选择" style="width:100%;height:auto"
-			            data-options="
-				            iconCls: 'icon-edit',
-				            singleSelect: true
-			            ">
-		            <thead>
-			            <tr>
-                            <th data-options="field:'OrganizationID',hidden:true">DCSID</th>
-                            <th data-options="field:'Name',width:100"></th>
-                            <th data-options="field:'StaffName_SHSPS',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHSPS',width:180">石灰石破碎</th>
-                            <th data-options="field:'StaffName_MFZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_MFZB',width:180">煤粉制备</th>
-                            <th data-options="field:'StaffName_SHENGLIAOZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHENGLIAOZB',width:180">生料制备</th>
-                            <th data-options="field:'StaffName_SHULIAOZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHULIAOZB',width:180">熟料制备</th>
-                            <th data-options="field:'StaffName_SHUINIZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHUINIZB',width:180">水泥粉磨</th>
-                            <th data-options="field:'StaffName_FZZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_FZZB',width:180">辅助生产</th>
-			            </tr>
-		            </thead>
-	            </table>
             </div>
 	    </div>
         <div class="easyui-panel" style="width:100%;height:auto;padding:10px;">
@@ -82,7 +55,7 @@
                             <th data-options="field:'Label',width:120">设备点号</th>
                             <th data-options="field:'EquipmentName',width:120">设备名称</th>
 				            <th data-options="field:'ReasonText',width:300">停机原因</th>
-                            <th data-options="field:'Remarks',width:300,editor:{type:'textbox'}">备注</th>
+                            <th data-options="field:'Remarks',width:300">备注</th>
 			            </tr>
 		            </thead>
 	            </table>
@@ -150,6 +123,26 @@
             </table>
         </div>
 	</div>
+    <!-- 操作员信息对话框开始 -->
+    <div id="dlgOperator" class="easyui-dialog" title="操作员信息" style="width:1000px;height:400px;" 
+        data-options="
+            iconCls:'ext-icon-group',
+            modal:true,
+            closed:true,
+        	buttons: [{
+		        text:'确认',
+		        iconCls:'icon-ok',
+		        handler:function(){
+			        $('#dlgOperator').dialog('close');
+		        }
+	        }]
+        ">
+        <!--操作员DataGrid-->
+	    <table id="operatorSelector" class="easyui-datagrid" style="width:100%;height:100%"
+			    data-options="singleSelect: true">
+	    </table>
+    </div>
+    <!-- 操作员信息对话框结束 -->
 	<script type="text/javascript">
 
 	    var organizationId = $.getUrlParam('organizationId'); //'C41B1F47-A48A-495F-A890-0AABB2F3BFF7'; //测试用
@@ -158,6 +151,8 @@
 	    $(document).ready(function () {
 	        // 获取交接班日志
 	        getWorkingShiftLog();
+	        // 获取操作员记录列
+	        getDataGridColumns();
 	        // 获取操作员记录
 	        getOperatorsLog();
 	        // 获取停机记录
@@ -197,6 +192,29 @@
 	        $('#advicesToNextShift').val(json.AdvicesToNextShift);
 	    }
 
+	    // 获取操作员DATAGRID列
+	    function getDataGridColumns() {
+	        var queryUrl = 'HandoverLogDetail.aspx/GetWorkingSectionsWithDataColumnFormat';
+	        var dataToSend = '{organizationId: "' + organizationId + '"}';
+
+	        $.ajax({
+	            type: "POST",
+	            url: queryUrl,
+	            data: dataToSend,
+	            contentType: "application/json; charset=utf-8",
+	            dataType: "json",
+	            success: function (msg) {
+	                initializeColumns(msg.d);
+	            }
+	        });
+	    }
+
+	    // 初始化操作员DATAGRID列
+	    function initializeColumns(json) {
+	        $('#operatorSelector').datagrid({
+	            columns: eval(json)
+	        });
+	    }
 
 	    // 获取操作员记录
 	    function getOperatorsLog() {
