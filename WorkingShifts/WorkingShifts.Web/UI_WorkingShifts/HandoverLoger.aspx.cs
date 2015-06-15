@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Transactions;
 using System.Web;
 using System.Web.Services;
@@ -17,7 +18,6 @@ namespace WorkingShifts.Web.UI_WorkingShifts
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            
         }
 
         #region Create
@@ -128,12 +128,16 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             DataTable dt = DCSSystemServcie.GetDCSSystemByOrganizationId(organizationId);
             return DataGridJsonParser.DataTableToJson(dt, "Name", "OrganizationID");
         }
-        //获取班次时间
+
+        /// <summary>
+        /// 获取班次信息
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <returns></returns>
         [WebMethod]
-        public static string GetShiftTimeInfo(string organizationId,string shift)
+        public static string GetShiftsInfo(string organizationId)
         {
-            string json=ShiftTimeService.GetShiftTime(organizationId, shift);
-            return json;
+            return ShiftTimeService.GetShiftSchedule(organizationId);
         }
 
         /// <summary>
@@ -191,9 +195,9 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         /// <param name="organizationId"></param>
         /// <returns></returns>
         [WebMethod]
-        public static string GetOriginalStocktakingInfoWithDataGridFormat(string organizationId)
+        public static string GetOriginalStocktakingInfoWithDataGridFormat(string organizationId, bool getCurrentShiftData)
         {
-            DataTable dt = StocktakingService.GetOriginalStocktakingInfo(organizationId);
+            DataTable dt = StocktakingService.GetOriginalStocktakingInfo(organizationId, getCurrentShiftData);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 
@@ -205,6 +209,62 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         public static string GetAppSettingValue()
         {
             return ConfigurationManager.AppSettings["StationId"];
+        }
+
+        #endregion
+
+        #region 操作员相关
+
+        /// <summary>
+        /// 获取工段信息
+        /// </summary>
+        /// <param name="organizationId">组织机构ID（分厂）</param>
+        /// <returns>DataGrid列信息</returns>
+        [WebMethod]
+        public static string GetWorkingSectionsWithDataColumnFormat(string organizationId)
+        {
+            DataTable dt = OperatorService.GetWorkingSections(organizationId);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append("[[");
+            sb.Append("{field:'OrganizationID',hidden:true},");
+            sb.Append("{field:'Name',width:100},");
+            foreach (DataRow dr in dt.Rows)
+            {
+                string id = dr["WorkingSectionID"].ToString().Trim().Replace('-', '_');
+                sb.Append("{field:'StaffName_");
+                sb.Append(id);
+                sb.Append("',hidden:true},");
+
+                sb.Append("{field:'StaffID_");
+                sb.Append(id);
+                sb.Append("',width:180,title:'");
+                sb.Append(dr["WorkingSectionName"]);
+                sb.Append("',");
+                sb.Append("formatter:function(value,row){return row.StaffName_" + id + ";},");
+                sb.Append("editor:{type:'combobox',options:{valueField:'StaffID',textField:'Combined',data:logerData.getStaffInfo()}}");
+                sb.Append("},");
+            }
+            sb.Remove(sb.Length - 1, 1);
+            sb.Append("]]");
+
+            return sb.ToString();
+        }
+
+        [WebMethod]
+        public static string GetOperatorsLog(string workingTeamShiftLogId)
+        {
+            workingTeamShiftLogId = "3E7B0F32-12F7-4C37-96FC-13830181906B";
+            DataTable dt = OperatorService.GetOperatorsLogHorizontal(workingTeamShiftLogId);
+            return DataGridJsonParser.DataTableToJson(dt);
+        }
+
+
+        [WebMethod]
+        public static string GetLastOperatorsLog(string organizationId, string workingTeam)
+        {
+            DataTable dt = OperatorService.GetLastOperatorsLogHorizontal(organizationId, workingTeam);
+            return DataGridJsonParser.DataTableToJson(dt);
         }
 
         #endregion

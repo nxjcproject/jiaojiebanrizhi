@@ -20,148 +20,36 @@
 
     <script type="text/javascript" src="/js/common/PrintFile.js" charset="utf-8"></script> 
 
-    <!-- 盘库js -->
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/HandoverLoger.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/ShiftsInfo.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/WorkingTeam.js" charset="utf-8"></script>
+    <!-- 盘库信息 -->
     <script type="text/javascript" src="/UI_WorkingShifts/js/page/Stocktaking.js" charset="utf-8"></script>
+    <!-- 操作员信息 -->
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/OperatorLoger.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/HaltLoger.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/DcsWarningLoger.js" charset="utf-8"></script>
+    <script type="text/javascript" src="/UI_WorkingShifts/js/page/EnergyConsumptionAlarmLoger.js" charset="utf-8"></script>
 </head>
 <body>
     
     <script>
-        //首先获得分厂的组织机构ID
-        var organizationId = 'zc_nxjc_byc_byf';
-        var queryUrl = 'HandoverLoger.aspx/GetAppSettingValue';
-        $.ajax({
-            type: "POST",
-            url: queryUrl,
-            data: '',
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            success: function (msg) {
-                organizationId = msg.d;
-                getStaffInfo();
-            }
-        });
+
     </script>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
         <div class="easyui-panel" style="padding:5px;width:100%;">
             <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。" onclick="OpenDlgStocktaking()">盘库信息</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。可不填写，默认为系统累计。" onclick="stocktaking.OpenDlgStocktaking()">盘库信息</a> | 
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'ext-icon-group'" title="填写操作员信息。可不填写，默认为上次编排，如有变动请修改。" onclick="operatorLoger.OpenDlgOperator()">操作员信息</a>
         </div>
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
-            <div style="float:left;">
-                时间：
-                <input id="time" class="easyui-datetimespinner" value="1111/11/11"  data-options="selections:[[11,13],[14,16]]" style="width:180px;" />
+            <div>
                 班次：
-                <select id="shifts" class="easyui-combobox" data-options="editable: false" name="state" style="width:80px;">
-		            <option value="A">甲班</option>
-		            <option value="B">乙班</option>
-		            <option value="C">丙班</option>
-                </select>
-                <a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" onclick="RefreshFun();">刷新</a>
-            </div>
-            <div style="float:right;">
-                当前班组：
-                <input id="workingTeam" class="easyui-combobox" data-options="valueField:'Name',textField:'Name',editable:false" name="state" style="width:180px;" />
+                <input id="shifts" class="easyui-combobox" data-options="editable:false,panelHeight:'auto'" style="width:130px;" />
+                班组：
+                <input id="workingTeam" class="easyui-combobox" data-options="editable:false,panelHeight:'auto'" style="width:80px;" />
                 负责人：
-                <input id="chargeMan" class="easyui-combobox" data-options="valueField:'StaffID',textField:'Combined'" style="width:180px" />
-            </div>
-            <div style="margin-top: 40px;">
-                <!--操作员DataGrid-->
-	            <table id="operatorSelector" class="easyui-datagrid" title="操作员选择" style="width:100%;height:auto"
-			            data-options="
-				            iconCls: 'icon-edit',
-				            singleSelect: true,
-				            onClickRow: osOnClickRow,
-                            toolbar: '#tbOperatorSelector'
-			            ">
-		            <thead>
-			            <tr>
-                            <th data-options="field:'OrganizationID',hidden:true">DCSID</th>
-                            <th data-options="field:'Name',width:100"></th>
-                            <th data-options="field:'StaffName_SHSPS',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHSPS',width:180,
-						            formatter:function(value,row){
-							            return row.StaffName_SHSPS;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">石灰石破碎</th>
-                            <th data-options="field:'StaffName_MFZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_MFZB',width:180,
-						            formatter:function(value,row){
-							            return row.StaffName_MFZB;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">煤粉制备</th>
-                            <th data-options="field:'StaffName_SHENGLIAOZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHENGLIAOZB',width:180,
-						            formatter:function(value,row){
-							            return row.StaffName_SHENGLIAOZB;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">生料制备</th>
-                            <th data-options="field:'StaffName_SHULIAOZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHULIAOZB',width:180,
-						            formatter:function(value,row){
-							            return row.StaffName_SHULIAOZB;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">熟料制备</th>
-                            <th data-options="field:'StaffName_SHUINIZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_SHUINIZB',width:180,
-						            formatter:function(value,row){
-							            return row.StaffName_SHUINIZB;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">水泥粉磨</th>
-                            <th data-options="field:'StaffName_FZZB',hidden:true"></th>
-                            <th data-options="field:'StaffID_FZZB',width:180,
-						            formatter:function(value,row){
-							            return row.StaffName_FZZB;
-						            },
-						            editor:{
-							            type:'combobox',
-							            options:{
-								            valueField:'StaffID',
-								            textField:'Combined',
-                                            data: getStaffInfo()
-							            }
-						            }">辅助生产</th>
-			            </tr>
-		            </thead>
-	            </table>
-	            <div id="tbOperatorSelector" style="height:auto">
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="osAccept()">应用</a>
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="osReject()">取消</a>
-	            </div>
+                <input id="chargeMan" class="easyui-combobox" data-options="valueField:'StaffID',textField:'Combined',panelHeight:'auto',data:logerData.getStaffInfo()" style="width:180px" />
             </div>
 	    </div>
         <div class="easyui-panel" style="width:100%;height:auto;padding:10px;">
@@ -171,8 +59,7 @@
 			            data-options="
 				            iconCls: 'icon-edit',
 				            singleSelect: true,
-				            onClickRow: hlOnClickRow,
-                            toolbar: '#tbHaltLoger'
+				            onClickRow: haltLoger.OnClickRow
 			            ">
 		            <thead>
 			            <tr>
@@ -191,7 +78,7 @@
 							            options:{
 								            valueField:'MachineHaltReasonID',
 								            textField:'ReasonText',
-								            data:getMachineHaltReasons(),
+								            data:logerData.getMachineHaltReason(),
                                             onClick: changeHaltReason
 							            }
 						            }">停机原因</th>
@@ -199,10 +86,6 @@
 			            </tr>
 		            </thead>
 	            </table>
-	            <div id="tbHaltLoger" style="height:auto">
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="hlAccept()">应用</a>
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="hlReject()">取消</a>
-	            </div>
             </div>
             <div style="margin-top: 20px;">
                 <!--dcs报警记录DataGrid-->
@@ -210,8 +93,7 @@
 			            data-options="
 				            iconCls: 'icon-edit',
 				            singleSelect: true,
-				            onClickRow: dcswlOnClickRow,
-                            toolbar: '#tbdcsWarningLoger'
+				            onClickRow: dcsWarningLoger.OnClickRow
 			            ">
 		            <thead>
 			            <tr>
@@ -225,10 +107,6 @@
 			            </tr>
 		            </thead>
 	            </table>
-	            <div id="tbdcsWarningLoger" style="height:auto">
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="dcswlAccept()">应用</a>
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="dcswlReject()">取消</a>
-	            </div>
             </div>
             <div style="margin-top: 20px;">
                 <!--能耗报警记录DataGrid-->
@@ -236,8 +114,7 @@
 			            data-options="
 				            iconCls: 'icon-edit',
 				            singleSelect: true,
-				            onClickRow: ecalOnClickRow,
-                            toolbar: '#tbecAlarmLoger'
+				            onClickRow: energyConsumptionAlarmLoger.OnClickRow
 			            ">
 		            <thead>
 			            <tr>
@@ -252,10 +129,6 @@
 			            </tr>
 		            </thead>
 	            </table>
-	            <div id="tbecAlarmLoger" style="height:auto">
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="ecalAccept()">应用</a>
-		            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="ecalReject()">取消</a>
-	            </div>
             </div>
         </div>
         <div class="easyui-panel" style="width:100%;height:auto;padding:10px;">
@@ -279,9 +152,36 @@
             </table>
         </div>
         <div class="easyui-panel" style="padding:5px;width:100%;">
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。可不填写，默认为系统累计。" onclick="stocktaking.OpenDlgStocktaking()">盘库信息</a> | 
+            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'ext-icon-group'" title="填写操作员信息。默认为上次编排，如有变动请修改。" onclick="operatorLoger.OpenDlgOperator()">操作员信息</a>
         </div>
 	</div>
+    <!-- 操作员信息对话框开始 -->
+    <div id="dlgOperator" class="easyui-dialog" title="操作员信息" style="width:1000px;height:400px;" 
+        data-options="
+            iconCls:'ext-icon-group',
+            modal:true,
+            closed:true,
+        	buttons: [{
+		        text:'确认',
+		        iconCls:'icon-ok',
+		        handler:function(){
+			        $('#dlgOperator').dialog('close');
+		        }
+	        }]
+        ">
+        <!--操作员DataGrid-->
+	    <table id="operatorSelector" class="easyui-datagrid" style="width:100%;height:100%"
+			    data-options="
+				    iconCls: 'icon-edit',
+				    singleSelect: true,
+				    onClickRow: operatorLoger.OnClickRow
+			    ">
+	    </table>
+    </div>
+    <!-- 操作员信息对话框结束 -->
+    <!-- 盘库信息对话框开始 -->
     <div id="dlgStocktaking" class="easyui-dialog" title="盘库信息" style="width:700px;height:400px;" 
         data-options="
             iconCls:'icon-filter',
@@ -296,171 +196,53 @@
 	        }]
         ">
         <!--盘库信息DataGrid-->
-	    <table id="dgStocktaking" class="easyui-datagrid"
+	    <table id="dgStocktaking" class="easyui-datagrid" style="width:100%;height:100%;"
 			    data-options="
-                    fill: true,
 				    iconCls: 'icon-edit',
 				    singleSelect: true,
-				    onClickRow: stOnClickRow,
+				    onClickRow: stocktaking.OnClickRow,
                     toolbar: '#tbdgStocktaking'
 			    ">
 		    <thead>
 			    <tr>
                     <th data-options="field:'OrganizationID',hidden:true">OrganizationID</th>
                     <th data-options="field:'VariableId',hidden:true">VariableId</th>
+                    <th data-options="field:'OrganizationName',width:120">生产线</th>
 				    <th data-options="field:'Name',width:120">物料名称</th>
                     <th data-options="field:'Unit',width:40">单位</th>
-				    <th data-options="field:'CumulantLastClass',width:150">本班</th>
-                    <th data-options="field:'DataValue',width:150,editor:{type:'numberbox',options:{min:0,precision:4}}">修正值</th>
-                    <th data-options="field:'Remark',width:150,editor:{type:'text'}">备注</th>
+				    <th data-options="field:'Data',width:120">系统值</th>
+                    <th data-options="field:'DataValue',width:120,editor:{type:'numberbox',options:{min:0,precision:4}}">修正值</th>
+                    <th data-options="field:'Remark',width:120,editor:{type:'text'}">备注</th>
 			    </tr>
 		    </thead>
 	    </table>
         <div id="tbdgStocktaking" style="height:auto">
-		    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="stAccept()">应用</a>
-		    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="stReject()">取消</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="stocktaking.Refresh()">刷新</a>
+		    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-save',plain:true" onclick="stocktaking.Accept()">应用</a>
+		    <a href="javascript:void(0)" class="easyui-linkbutton" data-options="iconCls:'icon-undo',plain:true" onclick="stocktaking.Reject()">取消</a>
 	    </div>
     </div>
+    <!-- 盘库信息对话框结束 -->
 	<script type="text/javascript">
 
-	    
-	    var staffInfo;//
-	    var shiftTimeInfo;//时间班的起止时间信息
-	    var machineHaltReasons;
+	    var validateFunctions = [];
 
-	    $(document).ready(function () {
-	        //初始化
-	        init();
-	    });
-        
-	    function init() {
-	        osEditIndex = undefined;//初始化为undefined	              
-	        // 初始化班组下拉列表
-	        initializeWorkingTeam();
-	        // 初始职工人员列表
-	        initializeStaffInfo();
-	        // 初始负责人下拉列表
-	        initializeChargManCombobox();
-	        //获取停机原因信息
-	        // getMachineHaltReasons();
-	        // 获取DCS系统信息
-	        getDCSSystem();
-	        //获取班次时间信息
-	        getShiftTime();
-	        // 获取停机记录
-	        getHaltLog();
-	        // 获取报警记录
-	        getWarningLog();
-	        // 获取能耗报警记录
-	        getEnergyConsumptionAlarmLog();
-	    }
-	    //刷新
-	    function RefreshFun() {
-	        init();
-	    }
-	    function getFactoryOrganizationID() {
-	        var queryUrl = 'HandoverLoger.aspx/GetAppSettingValue';
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: '',
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            success: function (msg) {
-	                organizationId = msg.d;
-	                initDelay();
-	            }
-	        });
-	    }
-	    // 初始化班组下拉列表
-	    function initializeWorkingTeam() {
-	        var queryUrl = 'HandoverLoger.aspx/GetWorkingTeamWithComboboxFormat';
-	        var dataToSend = '{organizationId: "' + organizationId + '"}';
+	    var logerData = new LogerData();
+	    var shiftsInfo = new ShiftsInfo(logerData.getOrganizationId());
+	    var workingTeam = new WorkingTeam(logerData.getOrganizationId());
+	    var stocktaking = new Stocktaking(logerData.getOrganizationId(), shiftsInfo);
+	    var operatorLoger = new OperatorLoger(logerData.getOrganizationId(), workingTeam);
+	    var haltLoger = new HaltLoger(logerData.getOrganizationId(), shiftsInfo);
+	    var dcsWarningLoger = new DcsWarningLoger(logerData.getOrganizationId(), shiftsInfo);
+	    var energyConsumptionAlarmLoger = new EnergyConsumptionAlarmLoger(logerData.getOrganizationId(), shiftsInfo);
 
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: dataToSend,
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            success: function (msg) {
-	                initializeWorkingTeamCombobox(jQuery.parseJSON(msg.d));
-	            }
-	        });
-	    }
+        // 挂载验证函数
+	    addValidateFunction(workingTeam.Validate);
+	    addValidateFunction(haltLoger.Validate);
 
-	    function initializeWorkingTeamCombobox(json) {
-	        $('#workingTeam').combobox({ data: json, onSelect: changeChargeMan });
-	    }
-
-        // 获取员工信息
-	    function getStaffInfo() {
-	        if (staffInfo == null || staffInfo == '[]') {
-	            var queryUrl = 'HandoverLoger.aspx/GetStaffInfoWithComboboxFormat';
-	            var dataToSend = '{organizationId: "' + organizationId + '"}';
-
-	            $.ajax({
-	                type: "POST",
-	                url: queryUrl,
-	                data: dataToSend,
-	                contentType: "application/json; charset=utf-8",
-	                dataType: "json",
-	                async: false,
-	                success: function (msg) {
-	                    staffInfo = jQuery.parseJSON(msg.d);
-	                }
-	            });
-	        }
-
-	        return staffInfo;
-	    }	   
-        //获取班次时间
-	    function getShiftTime() {
-	        var shift = $("#shifts").combobox('getText');
-	        var queryUrl = 'HandoverLoger.aspx/GetShiftTimeInfo';
-	        var dataToSend = '{organizationId: "' + organizationId +'",shift:"'+shift+ '"}';
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: dataToSend,
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            async: false,
-	            success: function (msg) {
-	                shiftTimeInfo = jQuery.parseJSON(msg.d);
-	            }
-	        });
-	    }
-	    // 初始职工人员列表
-	    function initializeStaffInfo() {
-	        getStaffInfo();
-	    }
-
-        // 获取停机原因
-	    function getMachineHaltReasons() {
-	        if (machineHaltReasons == null) {
-	            var queryUrl = 'HandoverLoger.aspx/GetMachineHaltReasonsWithCombotreeFormat';
-	            var dataToSend = '';
-
-	            $.ajax({
-	                type: "POST",
-	                url: queryUrl,
-	                data: dataToSend,
-	                contentType: "application/json; charset=utf-8",
-	                dataType: "json",
-	                async: false,
-	                success: function (msg) {
-	                    machineHaltReasons = jQuery.parseJSON(msg.d);
-	                }
-	            });
-	        }
-
-	        return machineHaltReasons;
-	    }
-
-	    // 初始负责人下拉列表
-	    function initializeChargManCombobox() {
-	        $('#chargeMan').combobox({ data: staffInfo });
+	    // 添加验证函数
+	    function addValidateFunction(handler) {
+	        validateFunctions.push(handler);
 	    }
 
 	    // 更新负责人
@@ -499,290 +281,21 @@
 	        $('#chargeMan').combobox('setValue', json.ID);
 	    }
 
-	    // 生成操作员选择grid
-	    function getDCSSystem() {
-	        var queryUrl = 'HandoverLoger.aspx/GetDCSSystemWithDataGridFormat';
-	        var dataToSend = '{organizationId: "' + organizationId + '"}';
-
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: dataToSend,
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            success: function (msg) {
-	                initializeStaffSelector(jQuery.parseJSON(msg.d));
-	            }
-	        });
-	    }
-
-	    function initializeStaffSelector(json) {
-	        $('#operatorSelector').datagrid({
-	            data: json
-	        });
-	    }
-
-	    // 操作员选择
-	    // os: operator selector
-	    var osEditIndex = undefined;
-	    function osEndEditing() {
-	        if (osEditIndex == undefined) { return true }
-	        if ($('#operatorSelector').datagrid('validateRow', osEditIndex)) {
-	            // 获取操作员选择编辑器中的工段列
-	            var cols = $('#operatorSelector').datagrid('getColumnFields');
-                // 除去第1列是DCS名称，遍历工段列，每个工段有两列
-	            for (var i = 2; i < cols.length; i += 2) {
-	                // cols[i]: StaffName_xxx
-                    // cols[i+1]: StaffID_xxx
-	                var ed = $('#operatorSelector').datagrid('getEditor', { index: osEditIndex, field: cols[i + 1] });
-	                var staffId = $(ed.target).combobox('getValue');
-	                var staffName = $(ed.target).combobox('getText');
-	                $('#operatorSelector').datagrid('getRows')[osEditIndex][cols[i + 1]] = staffId;
-	                $('#operatorSelector').datagrid('getRows')[osEditIndex][cols[i]] = staffName;
-	            }
-                // 结束编辑
-	            $('#operatorSelector').datagrid('endEdit', osEditIndex);
-	            osEditIndex = undefined;
-	            return true;
-	        } else {
-	            return false;
-	        }
-	    }
-	    function osOnClickRow(index) {
-	        if (osEditIndex != index) {
-	            if (osEndEditing()) {
-	                AcceptAll();
-	                $('#operatorSelector').datagrid('selectRow', index)
-							.datagrid('beginEdit', index);
-	                osEditIndex = index;
-	            } else {
-	                $('#operatorSelector').datagrid('selectRow', osEditIndex);
-	            }
-	        }
-	    }
-	    function osAccept() {
-	        if (osEndEditing()) {
-	            $('#operatorSelector').datagrid('acceptChanges');
-	        }
-	    }
-	    function osReject() {
-	        $('#operatorSelector').datagrid('rejectChanges');
-	        osEditIndex = undefined;
-	    }
-
-	    // 停机原因选择
-	    function getHaltLog() {
-	        var queryUrl = 'HandoverLoger.aspx/GetMachineHaltLogWithDataGridFormat';
-	        var dataToSend = '{organizationId: "' + organizationId +'",startTime:"'+shiftTimeInfo.startTime+'",endTime:"'+shiftTimeInfo.endTime+ '"}';
-
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: dataToSend,
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            success: function (msg) {
-	                initializeHaltLoger(jQuery.parseJSON(msg.d));
-	            }
-	        });
-	    }
-
-	    function initializeHaltLoger(json) {
-	        $('#haltLoger').datagrid({
-	            data: json
-	        });
-	    }
-
-	    // 停机原因选择
-	    // hl: halt log
-
-	    var hlEditIndex = undefined;
-	    function hlEndEditing() {
-	        if (hlEditIndex == undefined) { return true }
-	        if ($('#haltLoger').datagrid('validateRow', hlEditIndex)) {
-	            var ed = $('#haltLoger').datagrid('getEditor', { index: hlEditIndex, field: 'Reason' });
-	            var reasonId = $(ed.target).combobox('getValue');
-	            var reasonText = $(ed.target).combobox('getText');
-	            $('#haltLoger').datagrid('getRows')[hlEditIndex]['ReasonID'] = reasonId;
-	            $('#haltLoger').datagrid('getRows')[hlEditIndex]['ReasonText'] = reasonText;
-	            $('#haltLoger').datagrid('endEdit', hlEditIndex);
-	            hlEditIndex = undefined;
-	            return true;
-	        } else {
-	            return false;
-	        }
-	        return true;
-	    }
-	    function hlOnClickRow(index) {
-	        if (hlEditIndex != index) {
-	            if (hlEndEditing()) {
-	                AcceptAll();
-	                $('#haltLoger').datagrid('selectRow', index)
-							.datagrid('beginEdit', index);
-	                hlEditIndex = index;
-	            } else {
-	                $('#haltLoger').datagrid('selectRow', hlEditIndex);
-	            }
-	        }
-	    }
-	    function hlAccept() {
-	        if (hlEndEditing()) {
-	            $('#haltLoger').datagrid('acceptChanges');
-	        }
-	    }
-	    function hlReject() {
-	        $('#haltLoger').datagrid('rejectChanges');
-	        hlEditIndex = undefined;
-	    }
-
-	    // 生成报警信息grid
-	    function getWarningLog() {
-	        var queryUrl = 'HandoverLoger.aspx/GetDCSWarningLogWithDataGridFormat';
-	        //var dataToSend = '{organizationId: "' + organizationId + '"}';
-	        var dataToSend = '{organizationId: "' + organizationId + '",startTime:"' + shiftTimeInfo.startTime + '",endTime:"' + shiftTimeInfo.endTime + '"}';
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: dataToSend,
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            success: function (msg) {
-	                initializeWarningLoger(jQuery.parseJSON(msg.d));
-	            }
-	        });
-	    }
-
-	    function initializeWarningLoger(json) {
-	        $('#dcsWarningLoger').datagrid({
-	            data: json
-	        });
-	    }
-
-	    // 报警原因选择
-	    // dcswl: dcs warning log
-
-	    var dcswlEditIndex = undefined;
-	    function dcswlEndEditing() {
-	        if (dcswlEditIndex == undefined) { return true }
-	        $('#dcsWarningLoger').datagrid('endEdit', dcswlEditIndex);
-	        dcswlEditIndex = undefined;
-	        return true;
-	    }
-	    function dcswlOnClickRow(index) {
-	        AcceptAll();
-	        if (dcswlEditIndex != index) {
-	            if (dcswlEndEditing()) {
-	                $('#dcsWarningLoger').datagrid('selectRow', index)
-							.datagrid('beginEdit', index);
-	                dcswlEditIndex = index;
-	            } else {
-	                $('#dcsWarningLoger').datagrid('selectRow', dcswlEditIndex);
-	            }
-	        }
-	    }
-	    function dcswlAccept() {
-	        if (dcswlEndEditing()) {
-	            $('#dcsWarningLoger').datagrid('acceptChanges');
-	        }
-	    }
-	    function dcswlReject() {
-	        $('#dcsWarningLoger').datagrid('rejectChanges');
-	        dcswlEditIndex = undefined;
-	    }
-
-
-	    // 生成能耗报警信息
-	    function getEnergyConsumptionAlarmLog() {
-	        var queryUrl = 'HandoverLoger.aspx/GetEnergyConsumptionAlarmLogWithDataGridFormat';
-	        //var dataToSend = '{organizationId: "' + organizationId + '"}';
-	        var dataToSend = '{organizationId: "' + organizationId + '",startTime:"' + shiftTimeInfo.startTime + '",endTime:"' + shiftTimeInfo.endTime + '"}';
-	        $.ajax({
-	            type: "POST",
-	            url: queryUrl,
-	            data: dataToSend,
-	            contentType: "application/json; charset=utf-8",
-	            dataType: "json",
-	            success: function (msg) {
-	                initializeEnergyConsumptionAlarmLoger(jQuery.parseJSON(msg.d));
-	            }
-	        });
-	    }
-
-	    function initializeEnergyConsumptionAlarmLoger(json) {
-	        $('#ecAlarmLoger').datagrid({
-	            data: json
-	        });
-	    }
-
-	    // 能耗报警编辑
-	    // ecal: energy consumption alarm log
-
-	    var ecalEditIndex = undefined;
-	    function ecalEndEditing() {
-	        if (ecalEditIndex == undefined) { return true }
-	        $('#ecAlarmLoger').datagrid('endEdit', ecalEditIndex);
-	        ecalEditIndex = undefined;
-	        return true;
-	    }
-	    function ecalOnClickRow(index) {
-	        AcceptAll();
-	        if (ecalEditIndex != index) {
-	            if (ecalEndEditing()) {
-	                $('#ecAlarmLoger').datagrid('selectRow', index)
-							.datagrid('beginEdit', index);
-	                ecalEditIndex = index;
-	            } else {
-	                $('#ecAlarmLoger').datagrid('selectRow', ecalEditIndex);
-	            }
-	        }
-	    }
-	    function ecalAccept() {
-	        if (ecalEndEditing()) {
-	            $('#ecAlarmLoger').datagrid('acceptChanges');
-	        }
-	    }
-	    function ecalReject() {
-	        $('#ecAlarmLoger').datagrid('rejectChanges');
-	        ecalEditIndex = undefined;
-	    }
-
-	    // 取消选中
-	    function UnselectAll() {
-	        $('#operatorSelector').datagrid('unselectAll');
-	        $('#haltLoger').datagrid('unselectAll');
-	        $('#dcsWarningLoger').datagrid('unselectAll');
-	        $('#ecAlarmLoger').datagrid('unselectAll');
-	    }
-
-	    // 应用变化
-	    function AcceptAll() {
-	        osAccept();
-	        hlAccept();
-	        dcswlAccept();
-	        ecalAccept();
-
-	        UnselectAll();
-	    }
-
+        // 检验录入是否完整
 	    function Validate() {
-	        // 检验班组
-	        if ($('#workingTeam').combobox('getText') == "") {
-	            $.messager.alert('错误', '请选择当前班组', 'error');
-	            return false;
-	        }
 
 	        // 检验负责人
 	        if ($('#chargeMan').combobox('getText') == "") {
-	            $.messager.alert('错误', '请选择负责人', 'error');
+	            $.messager.alert('提示', '请选择负责人。', 'info');
 	            return false;
 	        }
 
-	        // 检验停机原因
-	        var haltLogs = $('#haltLoger').datagrid('getData');
-	        for (var i = 0; i < haltLogs.total; i++) {
-	            if (haltLogs.rows[i].ReasonID.length != 7) {
-	                $.messager.alert('错误', '请为停机时间： ' + haltLogs.rows[i].HaltTime + ' 的记录选择明确的停机原因', 'error');
-	                return false;
+	        if (validateFunctions.length > 0) {
+	            for (var i = 0; i < validateFunctions.length; i++) {
+	                if (validateFunctions[i]())
+	                    continue;
+	                else
+	                    return false;
 	            }
 	        }
 	    }
@@ -790,14 +303,14 @@
 	    // 提交
 	    function submit() {
 
-	        AcceptAll();
-	        //if (Validate() == false)
-	            //return;
+	        // 检验
+	        if (Validate() == false)
+	            return;
 
 	        $.messager.confirm('确认', '确认提交交接班日志？', function (r) {
 	            if (r) {
-	                var time = "\"time\":\"" + $('#time').datetimespinner('getValue') + "\"";
-	                var shifts = "\"shifts\":\"" + $('#shifts').combobox('getText') + "\"";
+	                var time = "\"time\":\"" + shiftsInfo.getShiftFullStartTime() + "\"";
+	                var shifts = "\"shifts\":\"" + shiftsInfo.getSelectedText() + "\"";
 	                var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
 	                var chargeMan = "\"chargeMan\":\"" + $('#chargeMan').combobox('getValue') + "\"";
 
@@ -816,7 +329,7 @@
                         performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
 
 	                var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
-	                var dataToSend = '{organizationId:"' + organizationId + '",json:\'' + loger + '\'}';
+	                var dataToSend = '{organizationId:"' + logerData.getOrganizationId() + '",json:\'' + loger + '\'}';
 
 	                $.ajax({
 	                    type: "POST",

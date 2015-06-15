@@ -37,23 +37,12 @@
                                     <td><input id="organizationName" class="easyui-textbox" readonly="readonly" style="width:100px" /></td>
                                     <td style="width:10px;"></td>
                                     <td>开始：</td>
-                                    <td><input id="startTime" class="easyui-datebox" style="width:150px" /></td>
+                                    <td><input id="startTime" class="easyui-datebox" style="width:100px" /></td>
                                     <td style="width:10px;"></td>
                                     <td>结束：</td>
-                                    <td><input id="endTime" class="easyui-datebox" style="width:150px" /></td>
+                                    <td><input id="endTime" class="easyui-datebox" style="width:100px" /></td>
                                     <td style="width:10px;"></td>
-                                    <td><a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="getOperatorsLog()">查询</a></td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <table>
-                                <tr>
-                                    <td><a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-reload',plain:true" onclick="getOperatorsLog();">刷新</a></td>
-                                    <td><div class="datagrid-btn-separator"></div></td>
-                                    <td></td>
+                                    <td><a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="getShiftLogs()">查询</a></td>
                                 </tr>
                             </table>
                         </td>
@@ -64,15 +53,15 @@
             <table id="dgHandoverLog" class="easyui-datagrid" data-options="idField:'WorkingTeamShiftLogID',toolbar:'#toolbar_HandoverLog',rownumbers:true,singleSelect:true,pagination:true,pageSize:10"" title="" style="width:100%;height:100%">
 		        <thead>
 			        <tr>
+                        <th data-options="field:'OperateColumn',formatter:formatOperateColumn,width:60">操作</th>
                         <th data-options="field:'WorkingTeamShiftLogID',hidden:true">交接班日志ID</th>
                         <th data-options="field:'ShiftDate',width:150">交接班时间</th>
-				        <th data-options="field:'Shifts',width:100">班次</th>
-                        <th data-options="field:'WorkingTeam',width:100">班组</th>
+				        <th data-options="field:'Shifts',width:60">班次</th>
+                        <th data-options="field:'WorkingTeam',width:60">班组</th>
 				        <th data-options="field:'PerformToObjectives',width:200">本班生产计划完成情况</th>
                         <th data-options="field:'ProblemsAndSettlements',width:200">本班出现的问题及处理情况</th>
                         <th data-options="field:'EquipmentSituation',width:200">本班设备运行情况</th>
                         <th data-options="field:'AdvicesToNextShift',width:200">下班工作重点及建议</th>
-                        <th data-options="field:'OperateColumn',formatter:formatOperateColumn,width:150">操作</th>
 			        </tr>
 		        </thead>
             </table>
@@ -106,7 +95,7 @@
         }
 
         // 获取交接班日志记录
-        function getOperatorsLog() {
+        function getShiftLogs() {
             var startTime = $('#startTime').datetimebox('getValue');
             var endTime = $('#endTime').datetimebox('getValue');
             var queryUrl = 'HandoverLog.aspx/GetWorkingTeamShiftLogsWithDataGridFormat';
@@ -129,6 +118,18 @@
                 data: json
             });
         }
+
+        $(document).ready(function () {
+            //设置默认为十天的时间
+            var startDate = new Date();
+            var endDate = new Date();
+            startDate.setDate(startDate.getDate() - 10);
+            endDate.setDate(endDate.getDate() + 1);
+            var startDateStr = startDate.getFullYear().toString() + '-' + (startDate.getMonth() + 1).toString() + '-' + startDate.getDate();
+            var endDateStr = endDate.getFullYear().toString() + '-' + (endDate.getMonth() + 1).toString() + '-' + endDate.getDate();
+            $('#startTime').datebox('setValue', startDateStr);
+            $('#endTime').datebox('setValue', endDateStr);
+        });
     </script>
 </body>
 </html>

@@ -41,7 +41,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         [WebMethod]
         public static string GetOperatorsLog(string workingTeamShiftLogId)
         {
-            DataTable dt = WorkingShiftsService.GetOperatorsLogHorizontal(workingTeamShiftLogId);
+            DataTable dt = OperatorService.GetOperatorsLogHorizontal(workingTeamShiftLogId);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 

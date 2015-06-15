@@ -24,6 +24,7 @@ namespace WorkingShifts.Service
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
             Query query = new Query("system_WorkingTeam");
             query.AddCriterion("OrganizationID", organizationId, SqlServerDataAdapter.Infrastruction.CriteriaOperator.Equal);
+            query.AddOrderByClause(new SqlServerDataAdapter.Infrastruction.OrderByClause("Name", false));
 
             return factory.Query(query);
         }

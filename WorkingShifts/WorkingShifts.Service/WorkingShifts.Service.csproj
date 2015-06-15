@@ -48,6 +48,7 @@
     <Compile Include="DCSSystemServcie.cs" />
     <Compile Include="EnergyConsumptionAlarmLogService.cs" />
     <Compile Include="MachineHaltService.cs" />
+    <Compile Include="OperatorService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShiftTimeService.cs" />
     <Compile Include="StaffService.cs" />

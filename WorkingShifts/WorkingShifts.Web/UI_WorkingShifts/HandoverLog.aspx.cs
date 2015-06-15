@@ -20,7 +20,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             {
 #if DEBUG
                 // 调试用,自定义的数据授权
-                List<string> m_DataValidIdItems = new List<string>() { "O03", "O0102" };
+                List<string> m_DataValidIdItems = new List<string>() { "zc_nxjc_byc", "zc_nxjc_qtx" };
                 AddDataValidIdGroup("ProductionOrganization", m_DataValidIdItems);
 #endif
                 this.OrganisationTree.Organizations = GetDataValidIdGroup("ProductionOrganization");                 //向web用户控件传递数据授权参数

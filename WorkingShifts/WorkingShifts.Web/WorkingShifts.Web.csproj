@@ -1588,8 +1588,14 @@
     <Content Include="UI_WorkingShifts\HandoverLog.aspx" />
     <Content Include="UI_WorkingShifts\HandoverLogDetail.aspx" />
     <Content Include="UI_WorkingShifts\HandoverLoger.aspx" />
+    <Content Include="UI_WorkingShifts\js\page\DcsWarningLoger.js" />
+    <Content Include="UI_WorkingShifts\js\page\EnergyConsumptionAlarmLoger.js" />
+    <Content Include="UI_WorkingShifts\js\page\HaltLoger.js" />
     <Content Include="UI_WorkingShifts\js\page\HandoverLoger.js" />
+    <Content Include="UI_WorkingShifts\js\page\OperatorLoger.js" />
+    <Content Include="UI_WorkingShifts\js\page\ShiftsInfo.js" />
     <Content Include="UI_WorkingShifts\js\page\Stocktaking.js" />
+    <Content Include="UI_WorkingShifts\js\page\WorkingTeam.js" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>

@@ -40,25 +40,30 @@ namespace WorkingShifts.Service
         /// <returns></returns>
         public static DataTable GetMachineHaltLog(string organizationId, string startTime, string endTime, string workingTeamShiftLogID = "")
         {
+            DataTable dt = new DataTable();
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
-            ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            //Query query = new Query("shift_MachineHaltLog");
-            //query.AddCriterion("OrganizationID", organizationId, CriteriaOperator.Equal);
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
 
-            //if (string.IsNullOrWhiteSpace(workingTeamShiftLogID))
-            //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
-            //else
-            //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
-            string mySql = @"SELECT A.* 
-                                FROM shift_MachineHaltLog AS A,system_Organization AS B
-                                WHERE A.OrganizationID=B.OrganizationID
-                                AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
-                                AND (A.HaltTime>=CONVERT(varchar(10),GETDATE(),20)+' {0}'
-                                AND A.HaltTime<=CONVERT(varchar(10),GETDATE(),20)+' {1}')";
-            if (endTime == "24:00")
-                endTime = "23:59";
-            DataTable dt = factory.Query(string.Format(mySql,startTime,endTime,organizationId));
+                command.CommandText = @"SELECT [A].* 
+                                          FROM [shift_MachineHaltLog] AS [A], [system_Organization] AS [B]
+                                         WHERE [A].[OrganizationID] = [B].[OrganizationID] AND 
+                                               [B].[LevelCode] LIKE (SELECT [LevelCode] FROM [system_Organization] WHERE [OrganizationID] = @organizationId) + '%' AND 
+                                               [A].[HaltTime] >= @startTime AND
+                                               [A].[HaltTime] <  @endTime";
+
+                command.Parameters.Add(new SqlParameter("organizationId", organizationId));
+                command.Parameters.Add(new SqlParameter("startTime", startTime));
+                command.Parameters.Add(new SqlParameter("endTime", endTime));
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(dt);
+                }
+            }
+
             return dt;
         }
 
