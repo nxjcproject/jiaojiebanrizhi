@@ -56,7 +56,17 @@
                         <th data-options="field:'OperateColumn',formatter:formatOperateColumn,width:60">操作</th>
                         <th data-options="field:'WorkingTeamShiftLogID',hidden:true">交接班日志ID</th>
                         <th data-options="field:'ShiftDate',width:150">交接班时间</th>
-				        <th data-options="field:'Shifts',width:60">班次</th>
+				        <th data-options="field:'Shifts',width:60,formatter: function(value,row,index){
+				                    if (row.Shifts == '甲班'){
+					                    return '夜班';
+				                    } else if (row.Shifts == '乙班') {
+					                    return '白班';
+				                    } else if (row.Shifts == '丙班') {
+                                        return '中班';
+                                    } else {
+                                        return row.Shifts;
+                                    }
+			                    }">班次</th>
                         <th data-options="field:'WorkingTeam',width:60">班组</th>
 				        <th data-options="field:'PerformToObjectives',width:200">本班生产计划完成情况</th>
                         <th data-options="field:'ProblemsAndSettlements',width:200">本班出现的问题及处理情况</th>

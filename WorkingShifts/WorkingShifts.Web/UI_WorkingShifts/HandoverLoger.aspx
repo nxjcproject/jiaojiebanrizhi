@@ -76,8 +76,9 @@
 						            editor:{
 							            type:'combotree',
 							            options:{
-								            valueField:'MachineHaltReasonID',
-								            textField:'ReasonText',
+                                            panelHeight:'auto',
+								            valueField:'id',
+								            textField:'text',
 								            data:logerData.getMachineHaltReason(),
                                             onClick: changeHaltReason
 							            }
