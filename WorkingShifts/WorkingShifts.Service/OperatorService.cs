@@ -224,13 +224,22 @@ namespace WorkingShifts.Service
 
             Dictionary<string, DataRow> rowDictionary = new Dictionary<string, DataRow>();
 
-            // 每个生产线的ID对应横表的一行
-            foreach (var productionLineId in productionLineIds)
+            //// 每个生产线的ID对应横表的一行
+            //foreach (var productionLineId in productionLineIds)
+            //{
+            //    DataRow row = result.NewRow();
+            //    row["OrganizationID"] = productionLineId;
+            //    result.Rows.Add(row);
+            //    rowDictionary.Add(productionLineId, row);
+            //}
+            DataTable productionLines = GetProductionLine(organizationId);
+            foreach (DataRow productionLine in productionLines.Rows)
             {
                 DataRow row = result.NewRow();
-                row["OrganizationID"] = productionLineId;
+                row["OrganizationID"] = productionLine["OrganizationID"].ToString();
+                row["Name"] = productionLine["Name"].ToString();
                 result.Rows.Add(row);
-                rowDictionary.Add(productionLineId, row);
+                rowDictionary.Add(productionLine["OrganizationID"].ToString(), row);
             }
 
             // 将纵表转换为横标数据
@@ -243,6 +252,30 @@ namespace WorkingShifts.Service
                 rowDictionary[id]["Name"] = verticalRow["ProductionLineName"];
                 rowDictionary[id]["StaffName_" + colname] = verticalRow["StaffName"];
                 rowDictionary[id]["StaffId_" + colname] = verticalRow["StaffId"] + " " + verticalRow["StaffName"];
+            }
+
+            return result;
+        }
+
+        private static DataTable GetProductionLine(string organizationId)
+        {
+            DataTable result = new DataTable();
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = @"SELECT [OrganizationID], [Name]
+                                          FROM [system_Organization]
+                                         WHERE [OrganizationID] LIKE @organizationId + '%' AND [Type] IS NOT NULL
+                                      ORDER BY [OrganizationID]";
+
+                command.Parameters.Add(new SqlParameter("organizationId", organizationId));
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(result);
+                }
             }
 
             return result;
