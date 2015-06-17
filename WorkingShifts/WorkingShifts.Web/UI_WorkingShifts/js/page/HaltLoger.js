@@ -18,6 +18,7 @@
 
     // 班次改变时，重新加载
     function _shiftChanged() {
+        that.EditIndex == undefined;
         getHaltLog();
     }
 
