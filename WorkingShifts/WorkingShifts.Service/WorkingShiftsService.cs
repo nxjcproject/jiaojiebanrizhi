@@ -99,7 +99,7 @@ namespace WorkingShifts.Service
                 command.Parameters.Add(new SqlParameter("workingTeamShiftLogID", workingTeamShiftLogID));
                 command.Parameters.Add(new SqlParameter("organizationId", organizationId));
                 command.Parameters.Add(new SqlParameter("shiftDate", datetime));
-                command.Parameters.Add(new SqlParameter("updateDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                command.Parameters.Add(new SqlParameter("updateDate", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")));
                 command.Parameters.Add(new SqlParameter("shifts", shifts));
                 command.Parameters.Add(new SqlParameter("workingTeam", workingTeam));
                 command.Parameters.Add(new SqlParameter("chargeManId", chargeManId));
