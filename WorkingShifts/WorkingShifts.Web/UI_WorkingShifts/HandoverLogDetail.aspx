@@ -21,6 +21,7 @@
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
         <div class="easyui-panel" style="padding:5px;width:100%;">
             <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-back'" onclick="javascript:history.go(-1)" >返回</a> | 
+            <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'icon-filter'" onclick="$('#dlgStocktaking').dialog('open')">盘库信息</a> | 
             <a href="javascript:void(0)" class="easyui-linkbutton" data-options="plain:true,iconCls:'ext-icon-group'" onclick="$('#dlgOperator').dialog('open')">操作员信息</a>
         </div>
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
@@ -143,6 +144,39 @@
 	    </table>
     </div>
     <!-- 操作员信息对话框结束 -->
+    <!-- 盘库信息对话框开始 -->
+    <div id="dlgStocktaking" class="easyui-dialog" title="盘库信息" style="width:700px;height:400px;" 
+        data-options="
+            iconCls:'icon-filter',
+            modal:true,
+            closed:true,
+        	buttons: [{
+		        text:'确认',
+		        iconCls:'icon-ok',
+		        handler:function(){
+			        $('#dlgStocktaking').dialog('close');
+		        }
+	        }]
+        ">
+        <!--盘库信息DataGrid-->
+	    <table id="dgStocktaking" class="easyui-datagrid" style="width:100%;height:100%;"
+			    data-options="
+				    iconCls: 'icon-edit',
+				    singleSelect: true
+			    ">
+		    <thead>
+			    <tr>
+                    <th data-options="field:'OrganizationName',width:120">生产线</th>
+				    <th data-options="field:'Name',width:120">物料名称</th>
+                    <th data-options="field:'Unit',width:40">单位</th>
+				    <th data-options="field:'Data',width:120">系统值</th>
+                    <th data-options="field:'DataValue',width:120,styler:DataStyler">修正值</th>
+                    <th data-options="field:'Remark',width:120">备注</th>
+			    </tr>
+		    </thead>
+	    </table>
+    </div>
+    <!-- 盘库信息对话框结束 -->
 	<script type="text/javascript">
 
 	    var organizationId = $.getUrlParam('organizationId'); //'C41B1F47-A48A-495F-A890-0AABB2F3BFF7'; //测试用
@@ -161,6 +195,8 @@
 	        getWarningLog();
 	        // 获取能耗报警记录
 	        getEnergyConsumptionAlarmLog();
+	        // 获取盘库信息
+	        getStockingLog();
 	    });
 
         // 获取交接班日志信息
@@ -308,14 +344,30 @@
 	        });
 	    }
 
-	    // 取消选中
-	    function UnselectAll() {
-	        $('#operatorSelector').datagrid('unselectAll');
-	        $('#haltLoger').datagrid('unselectAll');
-	        $('#dcsWarningLoger').datagrid('unselectAll');
-	        $('#ecAlarmLoger').datagrid('unselectAll');
+	    // 获取盘库信息
+	    function getStockingLog() {
+	        var queryUrl = 'HandoverLogDetail.aspx/GetStocktakingLogWithDataGridFormat';
+	        var dataToSend = '{workingTeamShiftLogId: "' + workingTeamShiftLogId + '"}';
+
+	        $.ajax({
+	            type: "POST",
+	            url: queryUrl,
+	            data: dataToSend,
+	            contentType: "application/json; charset=utf-8",
+	            dataType: "json",
+	            success: function (msg) {
+	                $('#dgStocktaking').datagrid({
+	                    data: jQuery.parseJSON(msg.d)
+	                });
+	            }
+	        });
 	    }
 
+	    function DataStyler(value, row, index) {
+	        if (value != row.Data) {
+	            return 'background-color:#00FFFF;';
+	        }
+	    }
 	</script>
     <form id="form1" runat="server"></form>
 </body>

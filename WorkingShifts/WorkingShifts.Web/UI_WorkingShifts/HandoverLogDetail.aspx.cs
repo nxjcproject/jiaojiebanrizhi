@@ -110,5 +110,16 @@ namespace WorkingShifts.Web.UI_WorkingShifts
             return DataGridJsonParser.DataTableToJson(dt);
         }
 
+        /// <summary>
+        /// 获取盘库信息
+        /// </summary>
+        /// <param name="workingTeamShiftLogId"></param>
+        /// <returns></returns>
+        [WebMethod]
+        public static string GetStocktakingLogWithDataGridFormat(string workingTeamShiftLogId)
+        {
+            DataTable dt = StocktakingService.GetBalancedStockingInfo(workingTeamShiftLogId);
+            return DataGridJsonParser.DataTableToJson(dt);
+        }
     }
 }

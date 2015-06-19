@@ -18,7 +18,6 @@
 
     // 班次改变时，重新加载
     function _shiftChanged() {
-        that.EditIndex == undefined;
         getHaltLog();
     }
 
@@ -26,6 +25,8 @@
         if (that.EditIndex == undefined) { return true }
         if ($(HTML_ID).datagrid('validateRow', that.EditIndex)) {
             var ed = $(HTML_ID).datagrid('getEditor', { index: that.EditIndex, field: 'Reason' });
+            if (ed == null)
+                return true;
             var reasonId = $(ed.target).combobox('getValue');
             var reasonText = $(ed.target).combobox('getText');
             $(HTML_ID).datagrid('getRows')[that.EditIndex]['ReasonID'] = reasonId;
@@ -80,9 +81,7 @@
     }
 
     function initializeHaltLoger(json) {
-        $(HTML_ID).datagrid({
-            data: json
-        });
+        $(HTML_ID).datagrid('loadData', json);
     }
 
     that.Validate = function () {

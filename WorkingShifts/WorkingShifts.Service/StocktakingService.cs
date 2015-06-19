@@ -129,5 +129,49 @@ namespace WorkingShifts.Service
                 CreateStocktakingInfo(workingTeamShiftLogID, organizationId, shift, datetime, variableId, dataValue, remark);
             }
         }
+
+        /// <summary>
+        /// 获取平衡后的物料信息
+        /// </summary>
+        /// <param name="workingTeamShiftLogID"></param>
+        /// <returns></returns>
+        public static DataTable GetBalancedStockingInfo(string workingTeamShiftLogID)
+        {
+            DataTable result = new DataTable();
+
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = @"  SELECT [O].[Name] AS [OrganizationName],
+                                                 [M].[Name] AS [Name],
+		                                         [M].[Unit] AS [Unit],
+                                                 (CASE WHEN [W].[Shifts] = '甲班' THEN [B].[First]
+                                                       WHEN [W].[Shifts] = '乙班' THEN [B].[Second]
+			                                           WHEN [W].[Shifts] = '丙班' THEN [B].[Third] END) AS [Data],
+                                                 (CASE WHEN [W].[Shifts] = '甲班' THEN [B].[FirstB]
+                                                       WHEN [W].[Shifts] = '乙班' THEN [B].[SecondB]
+			                                           WHEN [W].[Shifts] = '丙班' THEN [B].[ThirdB] END) AS [DataValue],
+		                                         [F].[Remark]
+                                            FROM [balance_Energy] AS [B] INNER JOIN
+	                                             [tz_Balance] AS [T] ON [B].[KeyId] = [T].[BalanceId] INNER JOIN
+		                                         [shift_WorkingTeamShiftLog] AS [W] ON [T].[TimeStamp] =  CONVERT(varchar(100), [W].[ShiftDate], 23) INNER JOIN
+		                                         [material_MaterialDetail] AS [M] ON [B].[VariableId] = [M].[VariableId] INNER JOIN
+		                                         [system_Organization] AS [O] ON [B].[OrganizationID] = [O].[OrganizationID] LEFT JOIN
+		                                         [balance_BalanceMartieralsClass] AS [F] ON [B].[OrganizationID] = [F].[OrganizationID] AND [B].[VariableId] = [F].[VariableId]
+                                           WHERE [W].[WorkingTeamShiftLogID] = @workingTeamShiftLogID
+                                        ORDER BY [O].[OrganizationID]";
+
+                command.Parameters.Add(new SqlParameter("workingTeamShiftLogID", workingTeamShiftLogID));
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(result);
+                }
+            }
+
+            return result;
+        }
     }
 }
