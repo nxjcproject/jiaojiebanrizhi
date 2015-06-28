@@ -31,7 +31,7 @@ namespace WorkingShifts.Service
             {
                 SqlCommand command = connection.CreateCommand();
                 command.CommandText = @"SELECT COUNT(*)
-                                          FROM [NXJC].[dbo].[shift_WorkingTeamShiftLog]
+                                          FROM [dbo].[shift_WorkingTeamShiftLog]
                                          WHERE [OrganizationID] = @organizationId AND
 	                                           CONVERT(varchar(10),[ShiftDate],120) = @date AND
 	                                           [Shifts] = @shifts";
