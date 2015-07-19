@@ -73,7 +73,7 @@ namespace WorkingShifts.Service
         /// <param name="organizationId">组织机构ID</param>
         /// <param name="workingTeamShiftLogID">交接班日志ID</param>
         /// <returns></returns>
-        public static DataTable GetMachineHaltLog(string organizationId,string workingTeamShiftLogID = "")
+        public static DataTable GetMachineHaltLog(string organizationId,string workingTeamShiftLogID)
         {
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 

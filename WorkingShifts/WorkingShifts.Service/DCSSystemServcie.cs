@@ -49,7 +49,7 @@ namespace WorkingShifts.Service
         /// <param name="organizationId"></param>
         /// <param name="workingTeamShiftLogID"></param>
         /// <returns></returns>
-        public static DataTable GetDCSWarningLog(string organizationId, string workingTeamShiftLogID = "")
+        public static DataTable GetDCSWarningLog(string organizationId, string workingTeamShiftLogID)
         {
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
@@ -67,8 +67,11 @@ namespace WorkingShifts.Service
                                 FROM shift_DCSWarningLog AS A,system_Organization AS B
                                 WHERE A.OrganizationID=B.OrganizationID
                                 AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID=@OrganizationID)+'%'
-                                AND CONVERT(varchar(10),A.StartingTime,20)=CONVERT(varchar(10),GETDATE(),20)";
-            SqlParameter parameter = new SqlParameter("OrganizationID", organizationId);
+                                AND WorkingTeamShiftLogID = @WorkingTeamShiftLogID";
+            SqlParameter[] parameter = new SqlParameter[] 
+            { new SqlParameter("OrganizationID", organizationId), 
+                new SqlParameter("WorkingTeamShiftLogID", workingTeamShiftLogID) };
+                
             DataTable dt = factory.Query(mySql, parameter);
             return dt;
         }

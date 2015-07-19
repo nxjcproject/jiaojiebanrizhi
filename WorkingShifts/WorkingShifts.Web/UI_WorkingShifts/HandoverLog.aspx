@@ -82,7 +82,8 @@
     <script type="text/javascript">
 
         function formatOperateColumn(val, row) {
-            return '<a href="HandoverLogDetail.aspx?organizationId=' + organizationId.trim() + '&workingTeamShiftLogId=' + row.WorkingTeamShiftLogID + '">查看</a>';
+            var m_organizationId = organizationId.replace(" ", "");
+            return '<a href="HandoverLogDetail.aspx?organizationId=' + m_organizationId + '&workingTeamShiftLogId=' + row.WorkingTeamShiftLogID + '">查看</a>';
         }
 
         // 分厂ID变量
@@ -101,7 +102,7 @@
             organizationId = node.OrganizationId;
 
             // 获取职工信息
-            loadStaffInfo();
+            //loadStaffInfo();                         
         }
 
         // 获取交接班日志记录

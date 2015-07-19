@@ -20,7 +20,7 @@ namespace WorkingShifts.Service
         /// <param name="organizationId"></param>
         /// <param name="workingTeamShiftLogID"></param>
         /// <returns></returns>
-        public static DataTable GetEnergyConsumptionAlarmLog(string organizationId, string workingTeamShiftLogID = "")
+        public static DataTable GetEnergyConsumptionAlarmLog(string organizationId, string workingTeamShiftLogID)
         {
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
 
@@ -36,9 +36,9 @@ namespace WorkingShifts.Service
                                 FROM shift_EnergyConsumptionAlarmLog AS A,system_Organization AS B
                                 WHERE A.OrganizationID=B.OrganizationID
                                 AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{0}')+'%'
-                                AND CONVERT(varchar(10),A.StartTime,20)=CONVERT(varchar(10),GETDATE(),20)";
+                                AND WorkingTeamShiftLogID = '{1}'";
 
-            DataTable dt = factory.Query(string.Format(mySql,organizationId));
+            DataTable dt = factory.Query(string.Format(mySql, organizationId, workingTeamShiftLogID));
             return dt;
         }
         /// <summary>

@@ -191,6 +191,7 @@
 		        text:'确认',
 		        iconCls:'icon-ok',
 		        handler:function(){
+                    stocktaking.EndEditing();
 			        $('#dlgStocktaking').dialog('close');
 		        }
 	        }]
@@ -309,6 +310,11 @@
 
 	        $.messager.confirm('确认', '确认提交交接班日志？', function (r) {
 	            if (r) {
+                    ///////////将处于编辑状态下设置成编辑完成状态
+	                haltLoger.EndEditing();
+	                dcsWarningLoger.EndEditing();
+	                energyConsumptionAlarmLoger.EndEditing();
+
 	                var time = "\"time\":\"" + shiftsInfo.getShiftFullStartTime() + "\"";
 	                var shifts = "\"shifts\":\"" + shiftsInfo.getSelectedText() + "\"";
 	                var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
@@ -325,7 +331,7 @@
 	                var equipmentSituation = "\"equipmentSituation\":\"" + $('#equipmentSituation').val() + "\"";
 	                var advicesToNextShift = "\"advicesToNextShift\":\"" + $('#advicesToNextShift').val() + "\"";
 
-	                var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' + stocktakingInfos + ','
+	                var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' + stocktakingInfos + ',' + 
                         performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
 
 	                var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
