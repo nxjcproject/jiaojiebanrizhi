@@ -1,20 +1,17 @@
-﻿var WorkingTeam = function (organizationId) {
+﻿var WorkingTeam = function () {
     var that = this;
 
     var HTML_ID = '#workingTeam';
 
-    that.OrganizationId = organizationId;
-
     // 班组信息
     var _workingTeams = undefined;
-
+    that.Load = function (organizationId) {
+        that.OrganizationId = organizationId;
+        _init()
+    }
     // 初始化
     function _init() {
         _initWorkingTeam();
-
-        $(document).ready(function () {
-            _initWorkingTeamSelector();
-        });
     }
 
     that.getWorkingTeams = function () {
@@ -60,6 +57,8 @@
             async: false,
             success: function (msg) {
                 _setWorkingTeams(jQuery.parseJSON(msg.d));
+                _initWorkingTeamSelector();
+                $(that).trigger("workingTeamLoadComplate");
             }
         });
     }
@@ -83,5 +82,5 @@
         return true;
     }
 
-    _init();
+    //_init();
 }

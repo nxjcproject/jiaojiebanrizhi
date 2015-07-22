@@ -1,24 +1,24 @@
 ﻿// 班次信息
-var ShiftsInfo = function (organizationId) {
+var ShiftsInfo = function () {
     var that = this;
-
     // 分厂组织机构ID
-    var _organizationId = organizationId;
+    var _organizationId;
 
     // 班次信息
     var _shifts = undefined;
 
     // 打开交接班登记界面的时间
     var _logginTime = undefined;
-
+    that.Load = function (organizationId) {
+        _organizationId = organizationId;
+        _init();
+    }
     // 初始化
     function _init() {
-        _initShifts();
         _logginTime = new Date();
+        _initShifts();
 
-        $(document).ready(function () {
-            _initShiftsSelector();
-        });
+
     }
 
     // 班次信息访问器
@@ -94,6 +94,8 @@ var ShiftsInfo = function (organizationId) {
             async: false,
             success: function (msg) {
                 _setShifts(jQuery.parseJSON(msg.d));
+                _initShiftsSelector();
+                $(that).trigger("shiftsInfoLoadComplate");
             }
         });
     }
@@ -175,5 +177,5 @@ var ShiftsInfo = function (organizationId) {
         return y + '-' + (m < 10 ? ('0' + m) : m) + '-' + (d < 10 ? ('0' + d) : d);
     }
 
-    _init();
+    //_init();
 }

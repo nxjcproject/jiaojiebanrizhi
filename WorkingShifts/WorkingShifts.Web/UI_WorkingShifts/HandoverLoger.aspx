@@ -17,7 +17,7 @@
 
     <script type="text/javascript" src="/lib/ealib/extend/jquery.PrintArea.js" charset="utf-8"></script> 
     <script type="text/javascript" src="/lib/ealib/extend/jquery.jqprint.js" charset="utf-8"></script>
-
+    <!--[if lt IE 8 ]><script type="text/javascript" src="/js/common/json2.min.js"></script><![endif]-->
     <script type="text/javascript" src="/js/common/PrintFile.js" charset="utf-8"></script> 
 
     <script type="text/javascript" src="/UI_WorkingShifts/js/page/HandoverLoger.js" charset="utf-8"></script>
@@ -33,9 +33,6 @@
 </head>
 <body>
     
-    <script>
-
-    </script>
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
         <div class="easyui-panel" style="padding:5px;width:100%;">
             <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
@@ -49,43 +46,13 @@
                 班组：
                 <input id="workingTeam" class="easyui-combobox" data-options="editable:false,panelHeight:'auto'" style="width:80px;" />
                 负责人：
-                <input id="chargeMan" class="easyui-combobox" data-options="valueField:'StaffID',textField:'Combined',panelHeight:'auto',data:logerData.getStaffInfo()" style="width:180px" />
+                <input id="chargeMan" class="easyui-combobox" style="width:180px" />
             </div>
 	    </div>
         <div class="easyui-panel" style="width:100%;height:auto;padding:10px;">
             <div>
                 <!--停机记录DataGrid-->
-	            <table id="haltLoger" class="easyui-datagrid" title="停机原因" style="width:100%;height:auto"
-			            data-options="
-				            iconCls: 'icon-edit',
-				            singleSelect: true,
-				            onClickRow: haltLoger.OnClickRow
-			            ">
-		            <thead>
-			            <tr>
-                            <th data-options="field:'MachineHaltLogID',hidden:true"></th>
-				            <th data-options="field:'HaltTime',width:120">停机时间</th>
-                            <th data-options="field:'ReasonID',hidden:true"></th>
-                            <th data-options="field:'ReasonText',hidden:true"></th>
-                            <th data-options="field:'Label',width:120">设备点号</th>
-                            <th data-options="field:'EquipmentName',width:120">设备名称</th>
-				            <th data-options="field:'Reason',width:300,
-                                    formatter:function(value,row){
-							            return row.ReasonText;
-						            },
-						            editor:{
-							            type:'combotree',
-							            options:{
-                                            panelHeight:'auto',
-								            valueField:'id',
-								            textField:'text',
-								            data:logerData.getMachineHaltReason(),
-                                            onClick: changeHaltReason
-							            }
-						            }">停机原因</th>
-                            <th data-options="field:'Remarks',width:300,editor:{type:'textbox'}">备注</th>
-			            </tr>
-		            </thead>
+	            <table id="haltLoger" class="easyui-datagrid" title="停机原因" style="width:100%;height:auto">
 	            </table>
             </div>
             <div style="margin-top: 20px;">
@@ -226,21 +193,52 @@
     <!-- 盘库信息对话框结束 -->
 	<script type="text/javascript">
 
-	    var validateFunctions = [];
+	    var validateFunctions;
+	    var logerData;
 
-	    var logerData = new LogerData();
-	    var shiftsInfo = new ShiftsInfo(logerData.getOrganizationId());
-	    var workingTeam = new WorkingTeam(logerData.getOrganizationId());
-	    var stocktaking = new Stocktaking(logerData.getOrganizationId(), shiftsInfo);
-	    var operatorLoger = new OperatorLoger(logerData.getOrganizationId(), workingTeam);
-	    var haltLoger = new HaltLoger(logerData.getOrganizationId(), shiftsInfo);
-	    var dcsWarningLoger = new DcsWarningLoger(logerData.getOrganizationId(), shiftsInfo);
-	    var energyConsumptionAlarmLoger = new EnergyConsumptionAlarmLoger(logerData.getOrganizationId(), shiftsInfo);
+	    var shiftsInfo = new ShiftsInfo();
+	    var workingTeam = new WorkingTeam();
+	    var stocktaking = new Stocktaking();
+	    var operatorLoger = new OperatorLoger();
+	    var haltLoger = new HaltLoger();
+	    var dcsWarningLoger = new DcsWarningLoger();
+	    var energyConsumptionAlarmLoger = new EnergyConsumptionAlarmLoger();
+	    
+	    
+	    $(document).ready(function () {
+	        $.messager.progress({
+	            title: '请稍后',
+	            msg: '页面加载中...'
+	        });
+	        validateFunctions = [];
+	        logerData = new LogerData();
 
-        // 挂载验证函数
-	    addValidateFunction(workingTeam.Validate);
-	    addValidateFunction(haltLoger.Validate);
+	        //当logerData数据加载完毕后进行后续的初始化
+	        $(logerData).bind("LogerDataLoadComplate", function () {
 
+	            shiftsInfo.Load(logerData.getOrganizationId());
+	            workingTeam.Load(logerData.getOrganizationId());
+
+	        });
+	        $(shiftsInfo).bind("shiftsInfoLoadComplate", function () {
+	            stocktaking.Load(logerData.getOrganizationId(), shiftsInfo);
+	            haltLoger.Load(logerData.getOrganizationId(), shiftsInfo);
+	            dcsWarningLoger.Load(logerData.getOrganizationId(), shiftsInfo);
+	            energyConsumptionAlarmLoger.Load(logerData.getOrganizationId(), shiftsInfo);
+	            // 挂载验证函数
+	            addValidateFunction(haltLoger.Validate);
+	            InithaltLoger();
+
+	            InitChargeManCombox();
+	            $.messager.progress('close');
+	        });
+	        $(workingTeam).bind("workingTeamLoadComplate", function () {
+	            operatorLoger.Load(logerData.getOrganizationId(), workingTeam);
+	            // 挂载验证函数
+	            addValidateFunction(workingTeam.Validate);
+	        });
+
+	    });
 	    // 添加验证函数
 	    function addValidateFunction(handler) {
 	        validateFunctions.push(handler);
@@ -300,63 +298,134 @@
 	            }
 	        }
 	    }
-
-	    // 提交
-	    function submit() {
-
-	        // 检验
-	        if (Validate() == false)
-	            return;
-
-	        $.messager.confirm('确认', '确认提交交接班日志？', function (r) {
-	            if (r) {
-                    ///////////将处于编辑状态下设置成编辑完成状态
-	                haltLoger.EndEditing();
-	                dcsWarningLoger.EndEditing();
-	                energyConsumptionAlarmLoger.EndEditing();
-
-	                var time = "\"time\":\"" + shiftsInfo.getShiftFullStartTime() + "\"";
-	                var shifts = "\"shifts\":\"" + shiftsInfo.getSelectedText() + "\"";
-	                var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
-	                var chargeMan = "\"chargeMan\":\"" + $('#chargeMan').combobox('getValue') + "\"";
-
-	                var operators = "\"operators\":" + (JSON.stringify($('#operatorSelector').datagrid('getData')));
-	                var haltLogs = "\"haltLogs\":" + (JSON.stringify($('#haltLoger').datagrid('getData')));
-	                var dcsWarningLogs = "\"dcsWarningLogs\":" + (JSON.stringify($('#dcsWarningLoger').datagrid('getData')));
-	                var ecAlarmLogs = "\"energyConsumptionAlarmLogs\":" + (JSON.stringify($('#ecAlarmLoger').datagrid('getData')));
-	                var stocktakingInfos = "\"stocktakingInfos\":" + (JSON.stringify($('#dgStocktaking').datagrid('getData')));
-
-	                var performToObjectives = "\"performToObjectives\":\"" + $('#performToObjectives').val() + "\"";
-	                var problemsAndSettlements = "\"problemsAndSettlements\":\"" + $('#problemsAndSettlements').val() + "\"";
-	                var equipmentSituation = "\"equipmentSituation\":\"" + $('#equipmentSituation').val() + "\"";
-	                var advicesToNextShift = "\"advicesToNextShift\":\"" + $('#advicesToNextShift').val() + "\"";
-
-	                var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' + stocktakingInfos + ',' + 
-                        performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
-
-	                var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
-	                var dataToSend = '{organizationId:"' + logerData.getOrganizationId() + '",json:\'' + loger + '\'}';
-
-	                $.ajax({
-	                    type: "POST",
-	                    url: queryUrl,
-	                    data: dataToSend,
-	                    contentType: "application/json; charset=utf-8",
-	                    dataType: "json",
-	                    success: function (msg) {
-	                        if (msg.d == "success") {
-	                            $.messager.alert('提示', '日志创建成功', 'info', function (r) {
-	                                window.location.href = 'HandoverLoger.aspx';
-	                            });
-	                        }
-	                    },
-	                    error: function (msg) {
-	                        $.messager.alert('提示', '日志创建失败，错误原因：' + jQuery.parseJSON(msg.responseText).Message, 'error');
-	                    }
-	                });
-	            }
+	    function InitChargeManCombox()
+	    {
+	        $('#chargeMan').combobox({
+	            valueField:'StaffID',
+	            textField:'Combined',
+	            panelHeight:'auto',
+	            data:logerData.getStaffInfo()
 	        });
 	    }
+        ///初始化停机原因datagrid
+	    function InithaltLoger() {
+	        $('#haltLoger').datagrid({
+	            title: '停机原因',
+	            dataType: "json",
+	            striped: true,
+	            //loadMsg: '',   //设置本身的提示消息为空 则就不会提示了的。这个设置很关键的
+	            rownumbers: true,
+	            singleSelect: true,
+	            iconCls: 'icon-edit',
+	            columns: [[{
+	                width: 120,
+	                title: '产线类型',
+	                field: 'MachineHaltLogID',
+	                hidden:true
+	            },{
+	                width: 120,
+	                title: '停机时间',
+	                field: 'HaltTime'
+	            } ,{
+	                width: 120,
+	                title: '停机原因ID',
+	                field: 'ReasonID',
+	                hidden:true
+	            },{
+	                width: 120,
+	                title: '停机原因名',
+	                field: 'ReasonText',
+	                hidden:true
+	            },{
+	                width: 120,
+	                title: '设备点号',
+	                field: 'Label'
+	            },{
+	                width: 120,
+	                title: '设备名称',
+	                field: 'EquipmentName'
+	            },{
+	                width: 300,
+	                title: '停机原因',
+	                field: 'Reason',
+	                formatter:function(value,row){
+	                    return row.ReasonText;
+	                },
+	                editor:{
+	                    type:'combotree',
+	                    options:{
+	                        panelHeight:'auto',
+	                        valueField:'id',
+	                        textField:'text',
+	                        data:logerData.getMachineHaltReason(),
+	                        onClick: changeHaltReason
+	                    }
+	                }
+	            },{
+	                width: 300,
+	                title: '备注',
+	                field: 'Remarks',
+	                editor:{type:'textbox'}
+	            }]],
+	            onClickRow: haltLoger.OnClickRow
+	        });
+	    }
+	        // 提交
+	        function submit() {
+
+	            // 检验
+	            if (Validate() == false)
+	                return;
+
+	            $.messager.confirm('确认', '确认提交交接班日志？', function (r) {
+	                if (r) {
+	                    ///////////将处于编辑状态下设置成编辑完成状态
+	                    haltLoger.EndEditing();
+	                    dcsWarningLoger.EndEditing();
+	                    energyConsumptionAlarmLoger.EndEditing();
+
+	                    var time = "\"time\":\"" + shiftsInfo.getShiftFullStartTime() + "\"";
+	                    var shifts = "\"shifts\":\"" + shiftsInfo.getSelectedText() + "\"";
+	                    var team = "\"workingTeam\":\"" + $('#workingTeam').combobox('getValue') + "\"";
+	                    var chargeMan = "\"chargeMan\":\"" + $('#chargeMan').combobox('getValue') + "\"";
+
+	                    var operators = "\"operators\":" + (JSON.stringify($('#operatorSelector').datagrid('getData')));
+	                    var haltLogs = "\"haltLogs\":" + (JSON.stringify($('#haltLoger').datagrid('getData')));
+	                    var dcsWarningLogs = "\"dcsWarningLogs\":" + (JSON.stringify($('#dcsWarningLoger').datagrid('getData')));
+	                    var ecAlarmLogs = "\"energyConsumptionAlarmLogs\":" + (JSON.stringify($('#ecAlarmLoger').datagrid('getData')));
+	                    var stocktakingInfos = "\"stocktakingInfos\":" + (JSON.stringify($('#dgStocktaking').datagrid('getData')));
+
+	                    var performToObjectives = "\"performToObjectives\":\"" + $('#performToObjectives').val() + "\"";
+	                    var problemsAndSettlements = "\"problemsAndSettlements\":\"" + $('#problemsAndSettlements').val() + "\"";
+	                    var equipmentSituation = "\"equipmentSituation\":\"" + $('#equipmentSituation').val() + "\"";
+	                    var advicesToNextShift = "\"advicesToNextShift\":\"" + $('#advicesToNextShift').val() + "\"";
+
+	                    var loger = '{' + time + ',' + shifts + ',' + team + ',' + chargeMan + ',' + operators + ',' + haltLogs + ',' + dcsWarningLogs + ',' + ecAlarmLogs + ',' + stocktakingInfos + ',' + 
+                            performToObjectives + ',' + problemsAndSettlements + ',' + equipmentSituation + ',' + advicesToNextShift + '}';
+
+	                    var queryUrl = 'HandoverLoger.aspx/CreateWorkingTeamShiftLog';
+	                    var dataToSend = '{organizationId:"' + logerData.getOrganizationId() + '",json:\'' + loger + '\'}';
+
+	                    $.ajax({
+	                        type: "POST",
+	                        url: queryUrl,
+	                        data: dataToSend,
+	                        contentType: "application/json; charset=utf-8",
+	                        dataType: "json",
+	                        success: function (msg) {
+	                            if (msg.d == "success") {
+	                                $.messager.alert('提示', '日志创建成功', 'info', function (r) {
+	                                    window.location.href = 'HandoverLoger.aspx';
+	                                });
+	                            }
+	                        },
+	                        error: function (msg) {
+	                            $.messager.alert('提示', '日志创建失败，错误原因：' + jQuery.parseJSON(msg.responseText).Message, 'error');
+	                        }
+	                    });
+	                }
+	            });
+	        }
 	</script>
     <form id="form1" runat="server"></form>
 </body>

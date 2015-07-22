@@ -1,14 +1,16 @@
-﻿var OperatorLoger = function (organizationId, workingTeam) {
+﻿var OperatorLoger = function () {
     var that = this;
 
     var HTML_ID = '#operatorSelector';
 
-    that.OrganizationId = organizationId;
-    that.WorkingTeam = workingTeam;
     that.EditIndex = undefined;
 
     var _datagridColumns = undefined;
-
+    that.Load = function (organizationId, workingTeam) {
+        that.OrganizationId = organizationId;
+        that.WorkingTeam = workingTeam;
+        _init();
+    }
     // 初始化
     function _init() {
         that.WorkingTeam.attachOnSelectedChanged(_workingTeamChanged);
@@ -134,5 +136,5 @@
         });
     }
 
-    _init();
+    //_init();
 }

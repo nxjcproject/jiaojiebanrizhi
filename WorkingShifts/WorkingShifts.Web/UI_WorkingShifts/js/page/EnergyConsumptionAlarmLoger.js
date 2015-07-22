@@ -1,15 +1,18 @@
-﻿var EnergyConsumptionAlarmLoger = function (organizationId, shift) {
+﻿var EnergyConsumptionAlarmLoger = function () {
     var that = this;
 
     var HTML_ID = '#ecAlarmLoger';
 
-    that.OrganizationId = organizationId;
-    that.Shift = shift;
     that.EditIndex = undefined;
-
+    that.Load = function (organizationId, shift) {
+        that.OrganizationId = organizationId;
+        that.shift = shift;
+        _init();
+    }
     // 初始化
     function _init() {
-        that.Shift.attachOnSelectedChanged(_shiftChanged);
+        that.shift.attachOnSelectedChanged(_shiftChanged);
+        getEnergyConsumptionAlarmLog();
     }
 
     // 班次改变时，重新加载
@@ -50,7 +53,7 @@
     // 生成能耗报警信息
     function getEnergyConsumptionAlarmLog() {
         var queryUrl = 'HandoverLoger.aspx/GetEnergyConsumptionAlarmLogWithDataGridFormat';
-        var dataToSend = '{organizationId: "' + that.OrganizationId + '",startTime:"' + shift.getSelected().startTime + '",endTime:"' + shift.getSelected().endTime + '"}';
+        var dataToSend = '{organizationId: "' + that.OrganizationId + '",startTime:"' + that.shift.getSelected().startTime + '",endTime:"' + that.shift.getSelected().endTime + '"}';
         $.ajax({
             type: "POST",
             url: queryUrl,
@@ -69,9 +72,6 @@
         });
     }
 
-    _init();
+    //_init();
 
-    $(document).ready(function () {
-        getEnergyConsumptionAlarmLog();
-    });
 }

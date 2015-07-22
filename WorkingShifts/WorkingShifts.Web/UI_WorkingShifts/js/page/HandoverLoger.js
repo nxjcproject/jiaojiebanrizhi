@@ -1,6 +1,7 @@
 ﻿var LogerData = function () {
     var that = this;
 
+    var HTML_ID = '#haltLoger';
     // 分厂组织机构ID
     var _organizationId = undefined;
     // 员工信息
@@ -80,6 +81,7 @@
             dataType: "json",
             success: function (msg) {
                 _setHaltReasons(jQuery.parseJSON(msg.d));
+                $(that).trigger("LogerDataLoadComplate");
             }
         });
     }

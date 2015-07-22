@@ -1,12 +1,14 @@
-﻿var HaltLoger = function (organizationId, shift) {
+﻿var HaltLoger = function () {
     var that = this;
-
     var HTML_ID = '#haltLoger';
 
-    that.OrganizationId = organizationId;
-    that.Shift = shift;
     that.EditIndex = undefined;
+    that.Load = function (organizationId, shift) {
 
+        that.OrganizationId = organizationId;
+        that.Shift = shift;
+        _init();
+    }
     // 初始化
     function _init() {
         that.Shift.attachOnSelectedChanged(_shiftChanged);
@@ -97,5 +99,5 @@
         return true;
     }
 
-    _init();
+    //_init();
 }

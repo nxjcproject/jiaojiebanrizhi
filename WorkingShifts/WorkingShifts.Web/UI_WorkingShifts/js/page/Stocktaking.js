@@ -1,14 +1,17 @@
-﻿var Stocktaking = function (organizationId, shift) {
+﻿var Stocktaking = function () {
     var that = this;
-    that.OrganizationId = organizationId;
-    that.Shift = shift;
+
     that.EditIndex = undefined;
 
     var _originalStocktakingInfoLoaded = false;
-
+    that.Load = function (organizationId, shift) {
+        that.OrganizationId = organizationId;
+        that.shift = shift;
+        _init
+    }
     // 初始化
     function _init() {
-        that.Shift.attachOnSelectedChanged(_shiftChanged);
+        that.shift.attachOnSelectedChanged(_shiftChanged);
     }
 
     // 班次改变时，重新加载
@@ -26,7 +29,7 @@
     function _loadOriginalStocktakingInfo() {
 
         var currentTime = new Date();
-        var shiftTime = shift.getSelected();
+        var shiftTime = that.shift.getSelected();
         var getCurrentShiftData = undefined;
 
         currentTime = currentTime.getHours() + ':' + currentTime.getMinutes();
@@ -102,5 +105,5 @@
         }
     }
 
-    _init();
+    //_init();
 };
