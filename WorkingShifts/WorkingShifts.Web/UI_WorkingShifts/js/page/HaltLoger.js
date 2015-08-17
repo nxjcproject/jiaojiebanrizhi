@@ -55,7 +55,7 @@
     }
 
     that.Accept = function () {
-        if (hlEndEditing()) {
+        if (that.EndEditing()) {
             $(HTML_ID).datagrid('acceptChanges');
         }
     }
@@ -87,6 +87,7 @@
     }
 
     that.Validate = function () {
+        that.Accept();
         // 检验停机原因
         var haltLogs = $(HTML_ID).datagrid('getData');
         for (var i = 0; i < haltLogs.total; i++) {
