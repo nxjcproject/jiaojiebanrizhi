@@ -35,9 +35,9 @@
     
 	<div id="wrapper" class="easyui-panel" style="width:100%;height:auto;padding:2px;">
         <div class="easyui-panel" style="padding:5px;width:100%;">
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。可不填写，默认为系统累计。" onclick="stocktaking.OpenDlgStocktaking()">盘库信息</a> | 
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'ext-icon-group'" title="填写操作员信息。可不填写，默认为上次编排，如有变动请修改。" onclick="operatorLoger.OpenDlgOperator()">操作员信息</a>
+            <a id="id_submit01" href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
+            <a id="id_stock01" href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。可不填写，默认为系统累计。" onclick="stocktaking.OpenDlgStocktaking()">盘库信息</a> | 
+            <a id="id_operator01" href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'ext-icon-group'" title="填写操作员信息。可不填写，默认为上次编排，如有变动请修改。" onclick="operatorLoger.OpenDlgOperator()">操作员信息</a>
         </div>
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
             <div>
@@ -120,9 +120,9 @@
             </table>
         </div>
         <div class="easyui-panel" style="padding:5px;width:100%;">
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。可不填写，默认为系统累计。" onclick="stocktaking.OpenDlgStocktaking()">盘库信息</a> | 
-            <a href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'ext-icon-group'" title="填写操作员信息。默认为上次编排，如有变动请修改。" onclick="operatorLoger.OpenDlgOperator()">操作员信息</a>
+            <a id="id_submit02" href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-ok'" title="提交后不可修改，请谨慎操作。" onclick="submit()">提交</a> | 
+            <a id="id_stock02" href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'icon-filter'" title="填写盘库信息。可不填写，默认为系统累计。" onclick="stocktaking.OpenDlgStocktaking()">盘库信息</a> | 
+            <a id="id_operator02" href="javascript:void(0)" class="easyui-linkbutton easyui-tooltip tooltip-f" data-options="plain:true,iconCls:'ext-icon-group'" title="填写操作员信息。默认为上次编排，如有变动请修改。" onclick="operatorLoger.OpenDlgOperator()">操作员信息</a>
         </div>
 	</div>
     <!-- 操作员信息对话框开始 -->
@@ -210,9 +210,11 @@
 	            title: '请稍后',
 	            msg: '页面加载中...'
 	        });
+
+	        initPageAuthority();
 	        validateFunctions = [];
 	        logerData = new LogerData();
-
+	        
 	        //当logerData数据加载完毕后进行后续的初始化
 	        $(logerData).bind("LogerDataLoadComplate", function () {
 
@@ -239,6 +241,38 @@
 	        });
 
 	    });
+	    //初始化页面的增删改查权限
+	    function initPageAuthority() {
+	        $.ajax({
+	            type: "POST",
+	            url: "HandoverLoger.aspx/AuthorityControl",
+	            data: "",
+	            contentType: "application/json; charset=utf-8",
+	            dataType: "json",
+	            async: false,//同步执行
+	            success: function (msg) {
+	                var authArray = msg.d;
+	                //增加
+	                if (authArray[1] == '0') {
+	                    $("#id_submit01").linkbutton('disable');
+	                    $("#id_stock01").linkbutton('disable');
+	                    $("#id_operator01").linkbutton('disable');
+	                    $("#id_submit02").linkbutton('disable');
+	                    $("#id_stock02").linkbutton('disable');
+	                    $("#id_operator02").linkbutton('disable');
+	                }
+	                //修改
+	                //if (authArray[2] == '0') {
+	                //    $("#edit").linkbutton('disable');
+	                //}
+	                //删除
+	                //if (authArray[3] == '0') {
+	                //    $("#delete").linkbutton('disable');
+	                //}
+	            }
+	        });
+	    }
+
 	    // 添加验证函数
 	    function addValidateFunction(handler) {
 	        validateFunctions.push(handler);
@@ -417,6 +451,8 @@
 	                                $.messager.alert('提示', '日志创建成功', 'info', function (r) {
 	                                    window.location.href = 'HandoverLoger.aspx';
 	                                });
+	                            } else if(msg.d=="noright") {
+	                                $.messager.alert('提示', '该用户没有提交权限！');
 	                            }
 	                        },
 	                        error: function (msg) {

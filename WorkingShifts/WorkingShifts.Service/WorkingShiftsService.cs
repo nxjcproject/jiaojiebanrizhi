@@ -229,7 +229,8 @@ namespace WorkingShifts.Service
                 SqlCommand command = connection.CreateCommand();
                 command.CommandText = @"SELECT   shift_WorkingTeamShiftLog.*
                                         FROM      shift_WorkingTeamShiftLog
-                                        WHERE   (OrganizationID = @organizationId) AND (ShiftDate > @startTime) AND (ShiftDate < @endTime)";
+                                        WHERE   (OrganizationID = @organizationId) AND (ShiftDate > @startTime) AND (ShiftDate < @endTime)
+                                        ORDER BY ShiftDate";
 
                 command.Parameters.Add(new SqlParameter("organizationId", organizationId));
                 command.Parameters.Add(new SqlParameter("startTime", startTime));

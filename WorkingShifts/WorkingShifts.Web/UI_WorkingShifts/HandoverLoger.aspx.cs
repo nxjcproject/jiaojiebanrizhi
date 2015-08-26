@@ -14,10 +14,24 @@ using WorkingShifts.Service;
 
 namespace WorkingShifts.Web.UI_WorkingShifts
 {
-    public partial class HandoverLoger : System.Web.UI.Page
+    public partial class HandoverLoger : WebStyleBaseForEnergy.webStyleBase
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            base.InitComponts();
+#if DEBUG
+            mPageOpPermission = "0000";
+#endif
+        }
+
+        /// <summary>
+        /// 增删改查权限控制
+        /// </summary>
+        /// <returns></returns>
+        [WebMethod]
+        public static char[] AuthorityControl()
+        {
+            return mPageOpPermission.ToArray();
         }
 
         #region Create
@@ -32,40 +46,46 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         public static string CreateWorkingTeamShiftLog(string organizationId, string json)
         {
             // todo: 事务处理应放在服务层，重构时应优化。
-
-            string time = json.JsonPick("time");
-            string shifts = json.JsonPick("shifts");
-            string workingTeam = json.JsonPick("workingTeam");
-            string chargeMan = json.JsonPick("chargeMan");
-            string operators = json.JsonPick("operators");
-            string haltLogs = json.JsonPick("haltLogs");
-            string dcsWarningLogs = json.JsonPick("dcsWarningLogs");
-            string energyConsumptionAlarmLogs = json.JsonPick("energyConsumptionAlarmLogs");
-            string stocktakingInfos = json.JsonPick("stocktakingInfos");
-            string performToObjectives = json.JsonPick("performToObjectives");
-            string problemsAndSettlements = json.JsonPick("problemsAndSettlements");
-            string equipmentSituation = json.JsonPick("equipmentSituation");
-            string advicesToNextShift = json.JsonPick("advicesToNextShift");
-
-            using (TransactionScope tsCope = new TransactionScope())
+            if (mPageOpPermission.ToArray()[1] == '1')
             {
-                // 创建交接班日志主表记录
-                string workingTeamShiftLogID = WorkingShiftsService.CreateShiftLog(organizationId, time, shifts, workingTeam, chargeMan, performToObjectives, problemsAndSettlements, equipmentSituation, advicesToNextShift);
-                // 添加操作员记录
-                WorkingShiftsService.CreateOperatorLogFromJson(workingTeamShiftLogID, operators);
-                // 更新停机原因
-                MachineHaltService.UpdateMachineHaltLogFromJson(workingTeamShiftLogID, haltLogs);
-                // 更新DCS报警记录
-                DCSSystemServcie.UpdateDCSWarningLogFromJson(workingTeamShiftLogID, dcsWarningLogs);
-                // 更新能耗报警记录
-                EnergyConsumptionAlarmLogService.UpdateEnergyConsumptionAlarmLogFromJson(workingTeamShiftLogID, energyConsumptionAlarmLogs);
-                // 添加盘库信息
-                StocktakingService.SaveStocktakingInfo(workingTeamShiftLogID, shifts, stocktakingInfos);
+                string time = json.JsonPick("time");
+                string shifts = json.JsonPick("shifts");
+                string workingTeam = json.JsonPick("workingTeam");
+                string chargeMan = json.JsonPick("chargeMan");
+                string operators = json.JsonPick("operators");
+                string haltLogs = json.JsonPick("haltLogs");
+                string dcsWarningLogs = json.JsonPick("dcsWarningLogs");
+                string energyConsumptionAlarmLogs = json.JsonPick("energyConsumptionAlarmLogs");
+                string stocktakingInfos = json.JsonPick("stocktakingInfos");
+                string performToObjectives = json.JsonPick("performToObjectives");
+                string problemsAndSettlements = json.JsonPick("problemsAndSettlements");
+                string equipmentSituation = json.JsonPick("equipmentSituation");
+                string advicesToNextShift = json.JsonPick("advicesToNextShift");
 
-                tsCope.Complete();
+                using (TransactionScope tsCope = new TransactionScope())
+                {
+                    // 创建交接班日志主表记录
+                    string workingTeamShiftLogID = WorkingShiftsService.CreateShiftLog(organizationId, time, shifts, workingTeam, chargeMan, performToObjectives, problemsAndSettlements, equipmentSituation, advicesToNextShift);
+                    // 添加操作员记录
+                    WorkingShiftsService.CreateOperatorLogFromJson(workingTeamShiftLogID, operators);
+                    // 更新停机原因
+                    MachineHaltService.UpdateMachineHaltLogFromJson(workingTeamShiftLogID, haltLogs);
+                    // 更新DCS报警记录
+                    DCSSystemServcie.UpdateDCSWarningLogFromJson(workingTeamShiftLogID, dcsWarningLogs);
+                    // 更新能耗报警记录
+                    EnergyConsumptionAlarmLogService.UpdateEnergyConsumptionAlarmLogFromJson(workingTeamShiftLogID, energyConsumptionAlarmLogs);
+                    // 添加盘库信息
+                    StocktakingService.SaveStocktakingInfo(workingTeamShiftLogID, shifts, stocktakingInfos);
+
+                    tsCope.Complete();
+                }
+
+                return "success";
             }
-
-            return "success";
+            else
+            {
+                return "noright";
+            }
         }
 
         #endregion
