@@ -47,7 +47,7 @@ namespace WorkingShifts.Service
             {
                 SqlCommand command = connection.CreateCommand();
 
-                command.CommandText = @"SELECT [A].* 
+                command.CommandText = @"SELECT [A].* ,B.Name as ProductLineName
                                           FROM [shift_MachineHaltLog] AS [A], [system_Organization] AS [B]
                                          WHERE [A].[OrganizationID] = [B].[OrganizationID] AND 
                                                [B].[LevelCode] LIKE (SELECT [LevelCode] FROM [system_Organization] WHERE [OrganizationID] = @organizationId) + '%' AND 

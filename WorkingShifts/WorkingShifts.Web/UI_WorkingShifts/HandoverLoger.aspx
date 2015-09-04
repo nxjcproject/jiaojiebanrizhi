@@ -89,6 +89,7 @@
                             <th data-options="field:'EnergyConsumptionAlarmLogID',hidden:true">EnergyConsumptionAlarmLogID</th>
 				            <th data-options="field:'StartTime',width:120">报警时间</th>
                             <th data-options="field:'TimeSpan',width:220">参数超标时间段</th>
+                            <th data-options="field:'ProductLineName',width:150">产线名称</th>
 				            <th data-options="field:'Name',width:150">工序名称</th>
                             <th data-options="field:'StandardValue',width:120">标准值</th>
                             <th data-options="field:'ActualValue',width:120">实际值</th>
@@ -370,15 +371,19 @@
 	                title: '停机原因名',
 	                field: 'ReasonText',
 	                hidden:true
-	            },{
+	            }, {
 	                width: 120,
-	                title: '设备点号',
-	                field: 'Label'
-	            },{
+	                title: '产线名称',
+	                field: 'ProductLineName'
+	            }, {
 	                width: 120,
 	                title: '设备名称',
 	                field: 'EquipmentName'
-	            },{
+	            }, {
+	                width: 120,
+	                title: '设备点号',
+	                field: 'Label'
+	            }, {
 	                width: 300,
 	                title: '停机原因',
 	                field: 'Reason',

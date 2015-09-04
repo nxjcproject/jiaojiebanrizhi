@@ -32,7 +32,7 @@ namespace WorkingShifts.Service
             //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
             //else
             //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
-            string mySql = @"SELECT A.* 
+            string mySql = @"SELECT A.* ,B.Name as ProductLineName
                                 FROM shift_EnergyConsumptionAlarmLog AS A,system_Organization AS B
                                 WHERE A.OrganizationID=B.OrganizationID
                                 AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{0}')+'%'
@@ -59,7 +59,7 @@ namespace WorkingShifts.Service
             //    query.AddCriterion("WorkingTeamShiftLogID", null, CriteriaOperator.NULL);
             //else
             //    query.AddCriterion("WorkingTeamShiftLogID", workingTeamShiftLogID, CriteriaOperator.Equal);
-            string mySql = @"SELECT A.* 
+            string mySql = @"SELECT A.* ,B.Name as ProductLineName
                                 FROM shift_EnergyConsumptionAlarmLog AS A,system_Organization AS B
                                 WHERE A.OrganizationID=B.OrganizationID
                                 AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
