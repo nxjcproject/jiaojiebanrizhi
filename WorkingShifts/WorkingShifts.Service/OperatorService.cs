@@ -86,7 +86,8 @@ namespace WorkingShifts.Service
                                           FROM [system_StaffInfo] INNER JOIN
                                                [shift_OperatorsLog] ON [system_StaffInfo].[StaffInfoID] = [shift_OperatorsLog].[StaffID] INNER JOIN
                                                [system_Organization] ON [shift_OperatorsLog].[OrganizationID] = [system_Organization].[OrganizationID]
-                                         WHERE [shift_OperatorsLog].[WorkingTeamShiftLogID] = @workingTeamShiftLogId";
+                                         WHERE [shift_OperatorsLog].[WorkingTeamShiftLogID] = @workingTeamShiftLogId
+                                                and [system_StaffInfo].[Enabled]='True'";
 
                 command.Parameters.Add(new SqlParameter("workingTeamShiftLogId", workingTeamShiftLogId));
 

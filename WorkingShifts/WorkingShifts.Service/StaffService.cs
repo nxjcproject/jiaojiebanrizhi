@@ -42,7 +42,10 @@ namespace WorkingShifts.Service
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 SqlCommand command = connection.CreateCommand();
-                command.CommandText = "SELECT system_StaffInfo.StaffInfoID, system_StaffInfo.Name FROM system_StaffInfo INNER JOIN system_WorkingTeam ON system_StaffInfo.StaffInfoID = system_WorkingTeam.ChargeManID WHERE (system_WorkingTeam.Name = '" + workingTeamName + "')";
+                command.CommandText = @"SELECT system_StaffInfo.StaffInfoID, system_StaffInfo.Name 
+                                            FROM system_StaffInfo INNER JOIN system_WorkingTeam 
+                                        ON system_StaffInfo.StaffInfoID = system_WorkingTeam.ChargeManID 
+                                        WHERE (system_WorkingTeam.Name = '" + workingTeamName + "') and system_StaffInfo.Enabled='True'";
 
                 SqlDataAdapter adapter = new SqlDataAdapter(command);
                 adapter.Fill(ds);
@@ -62,7 +65,7 @@ namespace WorkingShifts.Service
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
             Query query = new Query("system_StaffInfo");
             query.AddCriterion("OrganizationID", organizationId, SqlServerDataAdapter.Infrastruction.CriteriaOperator.Equal);
-
+            query.AddCriterion("Enabled", "True", SqlServerDataAdapter.Infrastruction.CriteriaOperator.Equal);
             return factory.Query(query);
         }
     }
