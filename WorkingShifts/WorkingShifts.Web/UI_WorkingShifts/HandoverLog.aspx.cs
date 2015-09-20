@@ -33,7 +33,21 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         public static string GetWorkingTeamShiftLogsWithDataGridFormat(string organizationId, string startTime, string endTime)
         {
             DataTable dt = WorkingShiftsService.GetWorkingTeamShiftLogs(organizationId, DateTime.Parse(startTime), DateTime.Parse(endTime));
-            return DataGridJsonParser.DataTableToJson(dt);
+            string json = DataGridJsonParser.DataTableToJson(dt);
+            string test=json.Replace("\n", "\\n");
+            //if (json.Contains("\r\n"))
+            //{
+            //    test = "1";
+            //}
+            //if (json.Contains("\n"))
+            //{
+            //    test = "2";
+            //}
+            //if (json.Contains("\r"))
+            //{
+            //    test = "3";
+            //}
+            return test;
         }
     }
 }

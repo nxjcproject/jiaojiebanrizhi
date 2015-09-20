@@ -20,7 +20,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         {
             base.InitComponts();
 #if DEBUG
-            mPageOpPermission = "0000";
+            mPageOpPermission = "1111";
 #endif
         }
 

@@ -36,7 +36,8 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         public static string GetWorkingTeamShiftLog(string workingTeamShiftLogId)
         {
             DataTable dt = WorkingShiftsService.GetWorkingTeamShiftLog(workingTeamShiftLogId);
-            return JsonHelper.DataTableFirstRowToJson(dt);
+            string json= JsonHelper.DataTableFirstRowToJson(dt);
+            return json.Replace("\n", "\\n");
         }
 
         [WebMethod]
