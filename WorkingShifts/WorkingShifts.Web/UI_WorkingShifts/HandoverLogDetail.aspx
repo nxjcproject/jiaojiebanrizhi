@@ -93,10 +93,11 @@
                             <th data-options="field:'EnergyConsumptionAlarmLogID',hidden:true">EnergyConsumptionAlarmLogID</th>
 				            <th data-options="field:'StartTime',width:120">报警时间</th>
                             <th data-options="field:'TimeSpan',width:220">参数超标时间段</th>
-				            <th data-options="field:'Name',width:150">工序名称</th>
-                            <th data-options="field:'StandardValue',width:120">标准值</th>
-                            <th data-options="field:'ActualValue',width:120">实际值</th>
-                            <th data-options="field:'Superscale',width:120">超标（%）</th>
+				            <th data-options="field:'Name',width:100">工序名称</th>
+                            <th data-options="field:'EnergyConsumptionType',width:100">报警类型</th>
+                            <th data-options="field:'StandardValue',width:100">标准值</th>
+                            <th data-options="field:'ActualValue',width:100">实际值</th>
+                            <th data-options="field:'Superscale',width:100">超标（%）</th>
                             <th data-options="field:'Reason',width:300">原因分析</th>
 			            </tr>
 		            </thead>
