@@ -61,12 +61,14 @@ namespace WorkingShifts.Service
         public static DataTable GetStaffInfo(string organizationId)
         {
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
-
-            ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            Query query = new Query("system_StaffInfo");
-            query.AddCriterion("OrganizationID", organizationId, SqlServerDataAdapter.Infrastruction.CriteriaOperator.Equal);
-            query.AddCriterion("Enabled", "True", SqlServerDataAdapter.Infrastruction.CriteriaOperator.Equal);
-            return factory.Query(query);
+            SqlServerDataFactory dataFactory = new SqlServerDataFactory(connectionString);
+            string sqlStr = @"select A.OrganizationID,A.Name as StaffInName,A.ChargeManID,A.Remarks,B.*
+                                    from [dbo].[system_WorkingTeam] A,[dbo].[system_StaffInfo] B
+                                    where A.ChargeManID = B.StaffInfoID
+                                    and A.OrganizationID=@OrganizationID";
+            SqlParameter parameter = new SqlParameter("OrganizationID", organizationId);
+            DataTable dt = dataFactory.Query(sqlStr, parameter);
+            return dt;
         }
     }
 
