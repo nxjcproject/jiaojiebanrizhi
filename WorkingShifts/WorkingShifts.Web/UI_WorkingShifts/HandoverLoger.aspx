@@ -285,13 +285,23 @@
 	        var workingTeamName = $('#workingTeam').combobox('getText');
 	        getChargeManByWorkingTeam(workingTeamName);
 	    }
-        
-        // 更新停机原因
+
+	    // 更新停机原因
 	    function changeHaltReason(node) {
-	        if (node.id.length != 7) {
-	            $.messager.alert('提示', '停机原因需要明确到第三层', 'info');
+	        //if (node.id.length != 7) {
+	        //$.messager.alert('提示', '停机原因需要明确到第三层', 'info');
+	        //}
+	        var tree = $(this).tree;
+	        //选中的节点是否为叶子节点,如果不是叶子节点,清除选中  
+	        var isLeaf = tree('isLeaf', node.target);
+	        if (!isLeaf) {
+	            //提示 
+	            $.messager.alert('提示', '停机原因需要选择最后一层', 'info');
+
 	        }
+
 	    }
+
 
         // 按班组获取负责人
 	    function getChargeManByWorkingTeam(workingTeamName) {
