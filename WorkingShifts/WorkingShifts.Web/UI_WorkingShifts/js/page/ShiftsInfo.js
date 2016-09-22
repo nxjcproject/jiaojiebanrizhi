@@ -165,7 +165,7 @@ var ShiftsInfo = function () {
         var h = time.getHours();
         var m = time.getMinutes();
 
-        return (h < 10 ? ('0' + h) : h) + '' + (m < 10 ? ('0' + m) : m);
+        return (h < 10 ? ('0' + h) : h) + ':' + (m < 10 ? ('0' + m) : m);
     }
 
     // 返回 yyyy-MM-dd
