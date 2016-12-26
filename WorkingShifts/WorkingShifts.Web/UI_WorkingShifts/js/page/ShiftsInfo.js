@@ -123,7 +123,8 @@ var ShiftsInfo = function () {
     // 根据打开界面时间获取当前班组
     function _getCurrentShift() {
         var currentTime = _getHHMM(_logginTime);
-
+        if (_shifts.丙班.endTime = '00:00')
+            _shifts.丙班.endTime = '24:00';
         if (currentTime >= _shifts.甲班.startTime && currentTime < _shifts.甲班.endTime)
             return '甲班';
         else if (currentTime >= _shifts.乙班.startTime && currentTime < _shifts.乙班.endTime)
