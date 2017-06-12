@@ -22,6 +22,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
 #if DEBUG
             mPageOpPermission = "1111";
 #endif
+            ShiftDateTime.Value = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");          //交接班日志统一为打开填写交接班日志页面的这一刻起
         }
 
         /// <summary>
@@ -168,25 +169,8 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         [WebMethod]
         public static string GetDCSWarningLogWithDataGridFormat(string organizationId,string startTime,string endTime)
         {
-            string m_StartTime = "";
-            string m_EndTime = "";
-            if (Int32.Parse(startTime.Replace(":", "")) > Int32.Parse(endTime.Replace(":", "")))
-            {
-                m_StartTime = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd " + startTime + ":00");
-            }
-            else
-            {
-                m_StartTime = DateTime.Now.ToString("yyyy-MM-dd " + startTime + ":00");
-            }
-            if (endTime == "24:00" || endTime == "00:00")
-            {
-                m_EndTime = DateTime.Now.ToString("yyyy-MM-dd 00:00:00");
-            }
-            else
-            {
-                m_EndTime = DateTime.Now.ToString("yyyy-MM-dd " + endTime + ":00");
-            }
-            DataTable dt = DCSSystemServcie.GetDCSWarningLog(organizationId, m_StartTime, m_EndTime);
+
+            DataTable dt = DCSSystemServcie.GetDCSWarningLog(organizationId, startTime, endTime);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 
@@ -211,20 +195,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         [WebMethod]
         public static string GetMachineHaltLogWithDataGridFormat(string organizationId,string startTime,string endTime)
         {
-            string m_StartTime = "";
-            string m_EndTime = "";
-            DateTime m_StartTimeTemp = DateTime.Parse(startTime);
-            DateTime m_EndTimeTemp = DateTime.Parse(endTime);
-            if (m_StartTimeTemp > m_EndTimeTemp)
-            {
-                m_StartTime = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd " + m_StartTimeTemp.ToString("HH:mm:ss"));
-            }
-            else
-            {
-                m_StartTime = m_StartTimeTemp.ToString("yyyy-MM-dd HH:mm:ss");
-            }
-            m_EndTime = m_EndTimeTemp.ToString("yyyy-MM-dd HH:mm:ss");
-            DataTable dt = MachineHaltService.GetMachineHaltLog(organizationId, m_StartTime, m_EndTime);
+            DataTable dt = MachineHaltService.GetMachineHaltLog(organizationId, startTime, endTime);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 
@@ -236,25 +207,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         [WebMethod]
         public static string GetEnergyConsumptionAlarmLogWithDataGridFormat(string organizationId, string startTime, string endTime)
         {
-            string m_StartTime = "";
-            string m_EndTime = "";
-            if (Int32.Parse(startTime.Replace(":", "")) > Int32.Parse(endTime.Replace(":", "")))
-            {
-                m_StartTime = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd " + startTime + ":00");
-            }
-            else
-            {
-                m_StartTime = DateTime.Now.ToString("yyyy-MM-dd " + startTime + ":00");
-            }
-            if (endTime == "24:00" || endTime == "00:00")
-            {
-                m_EndTime = DateTime.Now.ToString("yyyy-MM-dd 00:00:00");
-            }
-            else
-            {
-                m_EndTime = DateTime.Now.ToString("yyyy-MM-dd " + endTime + ":00");
-            }
-            DataTable dt = EnergyConsumptionAlarmLogService.GetEnergyConsumptionAlarmLog(organizationId, m_StartTime, m_EndTime);
+            DataTable dt = EnergyConsumptionAlarmLogService.GetEnergyConsumptionAlarmLog(organizationId, startTime, endTime);
             return DataGridJsonParser.DataTableToJson(dt);
         }
 

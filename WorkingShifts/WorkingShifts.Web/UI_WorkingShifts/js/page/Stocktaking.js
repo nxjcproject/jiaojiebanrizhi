@@ -27,27 +27,14 @@
     }
 
     function _loadOriginalStocktakingInfo() {
-
-        var currentTime = _getHHMM(new Date());
-        var shiftTime = that.shift.getSelected();
         var getCurrentShiftData = undefined;
-
-        //currentTime = currentTime.getHours() + ':' + currentTime.getMinutes();
-        // 当前的时间 在 所选的班次的时间段内时，说明需要获取当前的盘库信息，否则系统一律按照上一班处理。
-        if (shiftTime.startTime > shiftTime.endTime)    //当跨天的情况
-        {
-            if ((currentTime >= shiftTime.startTime && currentTime < "24:00") || (currentTime >= "00:00" && currentTime <= shiftTime.endTime))
-                getCurrentShiftData = true;
-            else
-                getCurrentShiftData = false;
+        var shiftType = $('#shifts').combobox('getText').substring(0, 3);
+        if (shiftType == "上一班") {
+            getCurrentShiftData = false;
         }
         else {
-            if (currentTime >= shiftTime.startTime && currentTime < shiftTime.endTime)
-                getCurrentShiftData = true;
-            else
-                getCurrentShiftData = false;
+            getCurrentShiftData = true;
         }
-
 
         var queryUrl = 'HandoverLoger.aspx/GetOriginalStocktakingInfoWithDataGridFormat';
         var dataToSend = '{organizationId: "' + that.OrganizationId + '", getCurrentShiftData: "' + getCurrentShiftData + '"}';
@@ -113,12 +100,6 @@
         if (_originalStocktakingInfoLoaded == false) {
             _loadOriginalStocktakingInfo();
         }
-    }
-    function _getHHMM(time) {
-        var h = time.getHours();
-        var m = time.getMinutes();
-
-        return (h < 10 ? ('0' + h) : h) + ':' + (m < 10 ? ('0' + m) : m);
     }
     //_init();
 };

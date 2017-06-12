@@ -15,25 +15,45 @@ var ShiftsInfo = function () {
     }
     // 初始化
     function _init() {
-        _logginTime = new Date();
+        var m_ServerDateTime = $('#ShiftDateTime').val();
+        _logginTime = new Date(m_ServerDateTime);
+       
         _initShifts();
-
-
     }
 
     // 班次信息访问器
     that.getShiftsInfo = function () {
         return _shifts;
     }
-
+    that.getLogginTime = function () {
+        return _logginTime;
+    }
     // 班次起始完整时间访问器
     that.getShiftFullStartTime = function () {
-        var time = new Date();
+        var m_ServerDateTime = $('#ShiftDateTime').val();
+        var time = new Date(m_ServerDateTime);
+        var m_CurrentTime = _getHHMM(time);
         var shiftType = $('#shifts').combobox('getText').substring(0, 3);
         var shiftValue = that.getSelected();
-        
-        if (shiftType == "上一班" && shiftValue.startTime > shiftValue.endTime) {
-            time.setDate(time.getDate() - 1);
+        if(shiftType == "上一班")
+        {
+            if (shiftValue.endTime == "00:00") {
+                time.setDate(time.getDate() - 1);
+            }
+            else if ( shiftValue.startTime > shiftValue.endTime) {           //跨天
+                time.setDate(time.getDate() - 1);
+            }
+            else if (m_CurrentTime <= shiftValue.endTime) {              //说明上个班是前一天
+                time.setDate(time.getDate() - 1);
+            }
+        }
+        if (shiftType == "当前班" && shiftValue.startTime > shiftValue.endTime)
+        {
+            if (shiftValue.endTime == "00:00") {          //没有跨天,结束时间在0点时
+            }
+            else if (m_CurrentTime >= "00:00" && m_CurrentTime <= shiftValue.endTime) {            //是当班时间交班的情况,并且在12点以后(当前已经跨天)
+                time.setDate(time.getDate() - 1);
+            }
         }
 
         return _getyyyymmdd(time) + " " + shiftValue.startTime;
@@ -41,9 +61,27 @@ var ShiftsInfo = function () {
 
     // 班次结束完整时间访问器
     that.getShiftFullEndTime = function () {
-        var time = new Date();
+        var m_ServerDateTime = $('#ShiftDateTime').val();
+        var time = new Date(m_ServerDateTime);
+        var m_CurrentTime = _getHHMM(time);
+        var shiftType = $('#shifts').combobox('getText').substring(0, 3);
         var shiftValue = that.getSelected();
+        if (shiftType == "上一班") {
+            if (shiftValue.endTime == "00:00") {
 
+            }
+            else if (m_CurrentTime <= shiftValue.endTime) {              //说明上个班是前一天
+                time.setDate(time.getDate() - 1);
+            }
+        }
+        if (shiftType == "当前班" && shiftValue.startTime > shiftValue.endTime) {
+            if (shiftValue.endTime == "00:00") {          //没有跨天,结束时间在0点时
+                time.setDate(time.getDate() + 1);
+            }
+            else if (m_CurrentTime >= shiftValue.startTime && m_CurrentTime < "24:00") {               //是当班时间交班的情况,并且在12点以前(当前还没跨天)
+                time.setDate(time.getDate() + 1);
+            }
+        }
         return _getyyyymmdd(time) + " " + shiftValue.endTime;
     }
 
@@ -57,7 +95,9 @@ var ShiftsInfo = function () {
     that.getSelectedText = function () {
         return $('#shifts').combobox('getValue');
     }
-
+    that.getHHMM = function (time) {
+        return _getHHMM(time);
+    }
     // 班次信息设置器（私有）
     function _setShifts(value) {
         _shifts = value;

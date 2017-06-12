@@ -56,7 +56,7 @@
     function getWarningLog() {
         var queryUrl = 'HandoverLoger.aspx/GetDCSWarningLogWithDataGridFormat';
         //var dataToSend = '{organizationId: "' + organizationId + '"}';
-        var dataToSend = '{organizationId: "' + that.OrganizationId + '",startTime:"' + that.shift.getSelected().startTime + '",endTime:"' + that.shift.getSelected().endTime + '"}';
+        var dataToSend = '{organizationId: "' + that.OrganizationId + '",startTime:"' + that.shift.getShiftFullStartTime() + '",endTime:"' + that.shift.getShiftFullEndTime() + '"}';
         $.ajax({
             type: "POST",
             url: queryUrl,

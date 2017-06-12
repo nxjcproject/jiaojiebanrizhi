@@ -479,6 +479,8 @@
 	            });
 	        }
 	</script>
-    <form id="form1" runat="server"></form>
+    <form id="MainForm" runat="server">
+        <asp:HiddenField ID="ShiftDateTime" runat="server" />
+    </form>
 </body>
 </html>
