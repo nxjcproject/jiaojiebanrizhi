@@ -123,27 +123,83 @@ var ShiftsInfo = function () {
     // 根据打开界面时间获取当前班组
     function _getCurrentShift() {
         var currentTime = _getHHMM(_logginTime);
-        if (_shifts.丙班.endTime = '00:00')
-            _shifts.丙班.endTime = '24:00';
-        if (currentTime >= _shifts.甲班.startTime && currentTime < _shifts.甲班.endTime)
+        if (_shifts != undefined) {
+            if (_shifts.丙班 != undefined) {                          //当3个时间班次的情况
+                if (_shifts.丙班.endTime == '24:00')
+                    _shifts.丙班.endTime = '00:00';
+
+                if (_shifts.丙班.startTime > _shifts.丙班.endTime) {
+                    if ((currentTime >= _shifts.丙班.startTime && currentTime < '24:00')
+                        || (currentTime >= '00:00' && currentTime < _shifts.丙班.endTime))
+                        return '丙班';
+                }
+                else {
+                    if (currentTime >= _shifts.丙班.startTime && currentTime < _shifts.丙班.endTime)
+                        return '丙班';
+                }
+            }
+            if (_shifts.乙班 != undefined) {                         //当2个时间班次的情况
+                if (_shifts.乙班.endTime == '24:00')
+                    _shifts.乙班.endTime = '00:00';
+
+                if (_shifts.乙班.startTime > _shifts.乙班.endTime) {
+                    if ((currentTime >= _shifts.乙班.startTime && currentTime < '24:00')
+                        || (currentTime >= '00:00' && currentTime < _shifts.乙班.endTime))
+                        return '乙班';
+                }
+                else {
+                    if (currentTime >= _shifts.乙班.startTime && currentTime < _shifts.乙班.endTime)
+                        return '乙班';
+                }
+            }
+            if (_shifts.甲班 != undefined) {                        //当只有1个时间班次的情况
+                if (_shifts.甲班.endTime == '24:00')
+                    _shifts.甲班.endTime = '00:00';
+
+                if (_shifts.甲班.startTime > _shifts.甲班.endTime) {
+                    if ((currentTime >= _shifts.甲班.startTime && currentTime < '24:00')
+                        || (currentTime >= '00:00' && currentTime < _shifts.甲班.endTime))
+                        return '甲班';
+                }
+                else {
+                    if (currentTime >= _shifts.甲班.startTime && currentTime < _shifts.甲班.endTime)
+                        return '甲班';
+                }
+            }
+
             return '甲班';
-        else if (currentTime >= _shifts.乙班.startTime && currentTime < _shifts.乙班.endTime)
-            return '乙班';
-        else if (currentTime >= _shifts.丙班.startTime && currentTime < _shifts.丙班.endTime)
-            return '丙班';
+        }
+        else {
+            return '甲班';
+        }
     }
 
     // 根据打开界面时间获取上一班组
     function _getLastShift() {
         var currentShift = _getCurrentShift();
-
-        switch (currentShift) {
-            case '甲班':
-                return '丙班';
-            case '乙班':
-                return '甲班';
-            case '丙班':
-                return '乙班';
+        if (_shifts.丙班 != undefined) {                          //当3个时间班次的情况
+            switch (currentShift) {
+                case '甲班':
+                    return '丙班';
+                case '乙班':
+                    return '甲班';
+                case '丙班':
+                    return '乙班';
+            }
+        }
+        else if (_shifts.乙班 != undefined) {                         //当2个时间班次的情况
+            switch (currentShift) {
+                case '甲班':
+                    return '乙班';
+                case '乙班':
+                    return '甲班';
+            }
+        }
+        else {
+            switch (currentShift) {
+                case '甲班':
+                    return '甲班';
+            }
         }
     }
 

@@ -51,8 +51,9 @@ namespace WorkingShifts.Service
                                           FROM [shift_MachineHaltLog] AS [A], [system_Organization] AS [B]
                                          WHERE [A].[OrganizationID] = [B].[OrganizationID] AND 
                                                [B].[LevelCode] LIKE (SELECT [LevelCode] FROM [system_Organization] WHERE [OrganizationID] = @organizationId) + '%' AND 
-                                               CONVERT(CHAR(19), [A].[HaltTime], 20) >= @startTime AND
-                                               CONVERT(CHAR(19), [A].[HaltTime], 20) <  @endTime";
+                                               [A].[HaltTime] >= @startTime AND
+                                               [A].[HaltTime] < @endTime
+                                         order by [A].[HaltTime]";
 
                 command.Parameters.Add(new SqlParameter("organizationId", organizationId));
                 command.Parameters.Add(new SqlParameter("startTime", startTime));

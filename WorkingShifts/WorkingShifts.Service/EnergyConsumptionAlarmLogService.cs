@@ -63,10 +63,8 @@ namespace WorkingShifts.Service
                                 FROM shift_EnergyConsumptionAlarmLog AS A,system_Organization AS B
                                 WHERE A.OrganizationID=B.OrganizationID
                                 AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
-                                AND(A.StartTime>=CONVERT(varchar(10),GETDATE(),20)+' {0}'
-                                AND A.StartTime<=CONVERT(varchar(10),GETDATE(),20)+' {1}')";
-            if (endTime == "24:00")
-                endTime = "23:59";
+                                AND(A.StartTime>='{0}' AND A.StartTime<'{1}')
+                                order by A.StartTime";
             DataTable dt = factory.Query(string.Format(mySql, startTime, endTime, organizationId));
             //DataTable dt = factory.Query(string.Format(mySql, organizationId));
             return dt;

@@ -99,10 +99,8 @@ namespace WorkingShifts.Service
                                 FROM shift_DCSWarningLog AS A,system_Organization AS B
                                 WHERE A.OrganizationID=B.OrganizationID
                                 AND B.LevelCode LIKE (select LevelCode from system_Organization where OrganizationID='{2}')+'%'
-                                AND (A.StartingTime>=CONVERT(varchar(10),GETDATE(),20)+' {0}'
-                                AND A.StartingTime<=CONVERT(varchar(10),GETDATE(),20)+' {1}')";
-            if (endTime == "24:00")
-                endTime = "23:59";
+                                AND (A.StartingTime>='{0}'AND A.StartingTime<'{1}')
+                                order by A.StartingTime";
             DataTable dt = factory.Query(string.Format(mySql, startTime, endTime, organizationId));
             //SqlParameter parameter = new SqlParameter("OrganizationID", organizationId);
             //DataTable dt = factory.Query(mySql, parameter);

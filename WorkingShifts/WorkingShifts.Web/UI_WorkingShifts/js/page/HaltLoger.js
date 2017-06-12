@@ -89,14 +89,14 @@
     that.Validate = function () {
         that.Accept();
         // 检验停机原因
-        var haltLogs = $(HTML_ID).datagrid('getData');
-        for (var i = 0; i < haltLogs.total; i++) {
-            if (haltLogs.rows[i].ReasonID.length != 7) {
-                $.messager.alert('提示', '请为停机时间： ' + haltLogs.rows[i].HaltTime + ' 的记录选择明确的停机原因', 'info');
-              //  return false;
-                  return true;      //暂时修改
-            }
-        }
+        //var haltLogs = $(HTML_ID).datagrid('getData');
+        //for (var i = 0; i < haltLogs.total; i++) {
+        //    if (haltLogs.rows[i].ReasonID.length != 7) {
+        //        $.messager.alert('提示', '请为停机时间： ' + haltLogs.rows[i].HaltTime + ' 的记录选择明确的停机原因', 'info');
+        //      //  return false;
+        //          return true;      //暂时修改
+        //    }
+        //}
 
         return true;
     }

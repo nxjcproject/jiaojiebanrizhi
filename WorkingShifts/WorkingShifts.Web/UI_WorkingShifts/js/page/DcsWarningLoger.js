@@ -70,9 +70,10 @@
     }
 
     function initializeWarningLoger(json) {
-        $(HTML_ID).datagrid({
-            data: json
-        });
+        //$(HTML_ID).datagrid({
+        //    data: json
+        //});
+        $(HTML_ID).datagrid('loadData', json);
     }
 
     //_init();
