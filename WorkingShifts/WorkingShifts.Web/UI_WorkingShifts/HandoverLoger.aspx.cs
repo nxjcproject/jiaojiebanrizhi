@@ -228,9 +228,12 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         /// </summary>
         /// <returns></returns>
         [WebMethod]
-        public static string GetAppSettingValue()
+        public static string GetFactoryOrganizationId()
         {
-            return ConfigurationManager.AppSettings["StationId"];
+            string m_OrganizationId = ConfigurationManager.AppSettings["StationId"];
+            DataTable m_OrganizationIdTable = WorkingShiftsService.GetFactoryOrganizationId(m_OrganizationId);
+            string m_OrganizationIdString = EasyUIJsonParser.ComboboxJsonParser.DataTableToJson(m_OrganizationIdTable);
+            return m_OrganizationIdString;
         }
 
         #endregion

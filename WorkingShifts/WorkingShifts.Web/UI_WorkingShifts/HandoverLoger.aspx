@@ -193,6 +193,25 @@
 	    </div>
     </div>
     <!-- 盘库信息对话框结束 -->
+    <!--组织机构选择对话框-->
+    <div id="dlg_OrganizationId" class="easyui-dialog" title="选择组织机构" style="width:170px;height:110px; padding:5px;" 
+        data-options="
+            iconCls:'icon-filter',
+            modal:true,
+            closed:true,
+        	buttons: [{
+		        text:'确认',
+		        iconCls:'icon-ok',
+		        handler:function(){
+        	    $('#dlg_OrganizationId').dialog('close');
+	            InitPageData();
+		        }
+	        }]
+        ">
+         <select id="Combobox_OrganizationIdSelector" class="easyui-combobox" name="Combobox_OrganizationIdSelector" data-options="panelHeight:'auto', editable:false, valueField: 'OrganizationID',textField: 'Name'" style="width: 140px;">
+         </select>
+    </div>
+    <!---->
 	<script type="text/javascript">
 
 	    var validateFunctions;
@@ -205,9 +224,11 @@
 	    var haltLoger = new HaltLoger();
 	    var dcsWarningLoger = new DcsWarningLoger();
 	    var energyConsumptionAlarmLoger = new EnergyConsumptionAlarmLoger();
-	    
-	    
+	    	    
 	    $(document).ready(function () {
+	        GetOrganizationId();
+	    });
+	    function InitPageData() {
 	        $.messager.progress({
 	            title: '请稍后',
 	            msg: '页面加载中...'
@@ -216,7 +237,7 @@
 	        initPageAuthority();
 	        validateFunctions = [];
 	        logerData = new LogerData();
-	        
+
 	        //当logerData数据加载完毕后进行后续的初始化
 	        $(logerData).bind("LogerDataLoadComplate", function () {
 
@@ -242,7 +263,7 @@
 	            addValidateFunction(workingTeam.Validate);
 	        });
 
-	    });
+	    }
 	    //初始化页面的增删改查权限
 	    function initPageAuthority() {
 	        $.ajax({
@@ -475,6 +496,34 @@
 	                            $.messager.alert('提示', '日志创建失败，错误原因：' + jQuery.parseJSON(msg.responseText).Message, 'error');
 	                        }
 	                    });
+	                }
+	            });
+	        }
+
+        /////////增加组织机构选择/////////
+	        function GetOrganizationId() {
+	            var queryUrl = 'HandoverLoger.aspx/GetFactoryOrganizationId';
+
+	            $.ajax({
+	                type: "POST",
+	                url: queryUrl,
+	                data: '',
+	                contentType: "application/json; charset=utf-8",
+	                dataType: "json",
+	                async: false,
+	                success: function (msg) {
+	                    var m_FactoryOrganizationItems = jQuery.parseJSON(msg.d)
+	                    if (m_FactoryOrganizationItems.length > 1) {                //当多个分厂组织机构
+	                        $('#Combobox_OrganizationIdSelector').combobox('loadData', m_FactoryOrganizationItems);
+	                        $('#Combobox_OrganizationIdSelector').combobox('setValue', m_FactoryOrganizationItems[0].OrganizationID);
+	                        $('#dlg_OrganizationId').dialog('open');
+	                    }
+	                    else {         //当一个分厂组织机构
+	                        $('#Combobox_OrganizationIdSelector').combobox('loadData', m_FactoryOrganizationItems);
+	                        $('#Combobox_OrganizationIdSelector').combobox('setValue', m_FactoryOrganizationItems[0].OrganizationID);
+	                        InitPageData();
+	                    }
+
 	                }
 	            });
 	        }

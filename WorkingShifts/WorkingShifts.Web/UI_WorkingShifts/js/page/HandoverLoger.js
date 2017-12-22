@@ -35,19 +35,8 @@
 
     // 初始化组织机构ID
     function _initOrganizationId() {
-        var queryUrl = 'HandoverLoger.aspx/GetAppSettingValue';
-
-        $.ajax({
-            type: "POST",
-            url: queryUrl,
-            data: '',
-            contentType: "application/json; charset=utf-8",
-            dataType: "json",
-            async: false,
-            success: function (msg) {
-                _setOrganizationId(msg.d);
-            }
-        });
+        var m_OrganizationId = $('#Combobox_OrganizationIdSelector').combobox('getValue');
+        _setOrganizationId(m_OrganizationId);
     }
 
     // 初始化员工信息

@@ -244,6 +244,36 @@ namespace WorkingShifts.Service
 
             return result;
         }
+        /// <summary>
+        /// 根据配置页面的组织机构找到分厂组织机构
+        /// </summary>
+        /// <param name="myOrganizationId">配置界面组织机构</param>
+        /// <returns></returns>
+        public static DataTable GetFactoryOrganizationId(string myOrganizationId)
+        {
 
+            DataTable result = new DataTable();
+            string connectionString = ConnectionStringFactory.NXJCConnectionString;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                SqlCommand command = connection.CreateCommand();
+                command.CommandText = @"select A.OrganizationID, A.Name 
+                                            from system_Organization A, system_Organization B
+                                            where B.OrganizationId = @organizationId
+                                            and A.LevelCode like B.LevelCode + '%'
+                                            and A.LevelType = 'Factory'
+                                            order by A.LevelCode";
+
+                command.Parameters.Add(new SqlParameter("organizationId", myOrganizationId));
+
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    adapter.Fill(result);
+                }
+            }
+
+            return result;
+        }
     }
 }
