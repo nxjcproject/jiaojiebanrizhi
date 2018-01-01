@@ -41,11 +41,11 @@
         </div>
 	    <div id="p" class="easyui-panel" title="交接班记录" style="width:100%;height:auto;padding:10px;">
             <div>
-                班次：
+                班次
                 <input id="shifts" class="easyui-combobox" data-options="editable:false,panelHeight:'auto'" style="width:130px;" />
-                班组：
+                &nbsp &nbsp 班组
                 <input id="workingTeam" class="easyui-combobox" data-options="editable:false,panelHeight:'auto'" style="width:80px;" />
-                负责人：
+                &nbsp &nbsp 负责人
                 <input id="chargeMan" class="easyui-combobox" style="width:180px" />
             </div>
 	    </div>

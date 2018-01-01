@@ -25,7 +25,7 @@
         </div>
         <!-- 左侧目录树结束 -->
         <!-- 中央区域开始 -->
-        <div data-options="region:'center',border:false,collapsible:false" style="padding-left:10px;">
+        <div data-options="region:'center',border:false,collapsible:false">
             <!-- 工具栏开始 -->
             <div id="toolbar_HandoverLog" style="display: none;">
                 <table>
@@ -33,13 +33,11 @@
                         <td>
                             <table>
                                 <tr>
-                                    <td>当前分厂：</td>
+                                    <td style="width: 50px; text-align: right;">组织机构</td>
                                     <td><input id="organizationName" class="easyui-textbox" readonly="readonly" style="width:100px" /></td>
-                                    <td style="width:10px;"></td>
-                                    <td>开始：</td>
+                                    <td style="width: 60px; text-align: right;">开始时间</td>
                                     <td><input id="startTime" class="easyui-datebox" style="width:100px" /></td>
-                                    <td style="width:10px;"></td>
-                                    <td>结束：</td>
+                                    <td style="width: 60px; text-align: right;">结束时间</td>
                                     <td><input id="endTime" class="easyui-datebox" style="width:100px" /></td>
                                     <td style="width:10px;"></td>
                                     <td><a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" onclick="getShiftLogs()">查询</a></td>
