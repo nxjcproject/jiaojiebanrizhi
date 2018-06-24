@@ -309,20 +309,14 @@
 
 	    // 更新停机原因
 	    function changeHaltReason(node) {
-	        //if (node.id.length != 7) {
-	        //$.messager.alert('提示', '停机原因需要明确到第三层', 'info');
-	        //}
 	        var tree = $(this).tree;
 	        //选中的节点是否为叶子节点,如果不是叶子节点,清除选中  
 	        var isLeaf = tree('isLeaf', node.target);
 	        if (!isLeaf) {
 	            //提示 
 	            $.messager.alert('提示', '停机原因需要选择最后一层', 'info');
-
 	        }
-
 	    }
-
 
         // 按班组获取负责人
 	    function getChargeManByWorkingTeam(workingTeamName) {
@@ -426,10 +420,13 @@
 	                    type:'combotree',
 	                    options:{
 	                        panelHeight:'auto',
-	                        valueField:'id',
-	                        textField:'text',
-	                        data:logerData.getMachineHaltReason(),
-	                        onClick: changeHaltReason
+	                        valueField: 'MachineHaltReasonID',
+	                        textField: 'text',
+	                        data: logerData.getMachineHaltReason(),
+	                        onLoadSuccess: function (row, data) {  
+	                            $(this).tree("collapseAll");//树节点全部闭合
+	                        },
+	                        onSelect: changeHaltReason
 	                    }
 	                }
 	            },{
@@ -503,7 +500,6 @@
         /////////增加组织机构选择/////////
 	        function GetOrganizationId() {
 	            var queryUrl = 'HandoverLoger.aspx/GetFactoryOrganizationId';
-
 	            $.ajax({
 	                type: "POST",
 	                url: queryUrl,
@@ -523,7 +519,6 @@
 	                        $('#Combobox_OrganizationIdSelector').combobox('setValue', m_FactoryOrganizationItems[0].OrganizationID);
 	                        InitPageData();
 	                    }
-
 	                }
 	            });
 	        }

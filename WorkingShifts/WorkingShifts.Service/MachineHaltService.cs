@@ -21,14 +21,11 @@ namespace WorkingShifts.Service
         public static DataTable GetMachineHaltReasons()
         {
             string connectionString = ConnectionStringFactory.NXJCConnectionString;
-
             ISqlServerDataFactory factory = new SqlServerDataFactory(connectionString);
-            //Query query = new Query("system_MachineHaltReason");
-            string mySql = @"SELECT  RTRIM(LTRIM(MachineHaltReasonID)) AS MachineHaltReasonID, ReasonText, Remarks
-                                FROM system_MachineHaltReason AS A
-                                WHERE A.Enabled='true'
-                                order by A.MachineHaltReasonID";
-
+            string mySql = @"SELECT  RTRIM(LTRIM(LevelCode)) AS LevelCode, ReasonText, RTRIM(LTRIM(MachineHaltReasonID)) AS MachineHaltReasonID
+                                FROM system_MachineHaltReason
+                                WHERE Enabled='true'
+                                order by LevelCode";
             return factory.Query(mySql);
         }
 

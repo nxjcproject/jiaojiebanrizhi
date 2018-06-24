@@ -182,7 +182,7 @@ namespace WorkingShifts.Web.UI_WorkingShifts
         public static string GetMachineHaltReasonsWithCombotreeFormat()
         {
             DataTable dt = MachineHaltService.GetMachineHaltReasons();
-            string json=TreeJsonParser.DataTableToJsonByLevelCode(dt, "MachineHaltReasonID", "ReasonText", "Remarks");
+            string json = TreeJsonParser.DataTableToJsonByLevelCode(dt, "LevelCode", "ReasonText", "MachineHaltReasonID");
             return json;
            // return EasyUIJsonParser.ComboboxJsonParser.DataTableToJson(dt, "MachineHaltReasonID", "ReasonText", "Remarks");
         }
